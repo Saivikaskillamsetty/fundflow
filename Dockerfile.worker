@@ -7,12 +7,16 @@
 FROM node:24-slim
 
 # Chromium for puppeteer-core discovery, Python for parser/extract.py.
+# tini reaps orphaned processes: every headless-Chrome discovery leaves crashpad
+# and renderer children behind, and a bare node/npm PID 1 never reaps them, so a
+# long-lived worker accumulates zombies until it runs out of PIDs.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       chromium \
       python3 \
       python3-venv \
       ca-certificates \
       fonts-liberation \
+      tini \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CHROME_PATH=/usr/bin/chromium
@@ -34,5 +38,7 @@ RUN python3 -m venv /opt/parser-venv \
 
 COPY . .
 
-# tsx runs the TypeScript worker directly — no separate build step needed.
+# tini as PID 1 so Chrome's orphans are reaped; tsx runs the TypeScript worker
+# directly, so there is no separate build step.
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["npx", "tsx", "src/worker.ts"]
