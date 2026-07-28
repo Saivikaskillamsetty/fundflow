@@ -50,7 +50,10 @@ async function main() {
         const parsed = await runParser(dest, item.fundNameHint, src.amc);
         const top = parsed.filter((f) => isTopFund(f.amc, f.fund_name));
         let n = 0;
-        for (const f of top) n += (await ingestFund(f)).holdingsInserted;
+        // Signals are rebuilt once at the end, so skip the per-fund pass.
+        for (const f of top) {
+          n += (await ingestFund(f, { recomputeSignals: false })).holdingsInserted;
+        }
         await db
           .update(uploads)
           .set({

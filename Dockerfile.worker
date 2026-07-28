@@ -22,8 +22,11 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 # Node deps first so dependency layers cache across source edits.
+# --include=dev is required despite NODE_ENV=production: the worker's entrypoint
+# is tsx, and puppeteer-core drives AMC discovery — both live in devDependencies
+# because the Vercel build does not need them.
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 COPY parser/requirements.txt ./parser/requirements.txt
 RUN python3 -m venv /opt/parser-venv \

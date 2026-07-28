@@ -1,0 +1,25 @@
+# Credentials must never be baked into an image layer — the worker gets these
+# at runtime via --env-file / platform secrets.
+.env
+.env.*
+!.env.example
+
+# Host-built artifacts. node_modules and the Python venv are macOS binaries;
+# copying them over the image's own `npm ci` / venv would break native modules.
+node_modules
+parser/.venv
+__pycache__
+*.pyc
+
+# Local state, not application code.
+uploads
+logs
+.next
+.git
+.vercel
+.claude
+coverage
+*.tsbuildinfo
+
+# Fixtures are test data, not needed by the worker at runtime.
+parser/fixtures
