@@ -52,3 +52,4 @@ drizzle/meta/_journal.json.bak
 logs/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+!.env.example

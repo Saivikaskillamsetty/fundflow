@@ -1,0 +1,72 @@
+// Where downloaded/uploaded portfolio workbooks live.
+//
+// Single-host deployments keep files under ./uploads and hand the parser that
+// path directly. When the web app and the worker run on different machines
+// (Next.js on Vercel, worker on a container host) they no longer share a disk,
+// so files go to Vercel Blob and the parser materializes a temp copy instead.
+//
+// Driver is chosen by STORAGE_DRIVER, defaulting to blob whenever a blob token
+// is present — so local dev stays on disk with no configuration.
+import { randomUUID } from "node:crypto";
+import { mkdir, writeFile, unlink } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+
+function driver(): "blob" | "local" {
+  const explicit = process.env.STORAGE_DRIVER;
+  if (explicit === "blob" || explicit === "local") return explicit;
+  return process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "local";
+}
+
+/** A stored reference is either an absolute local path or an https URL. */
+export function isRemote(storedPath: string): boolean {
+  return /^https?:\/\//i.test(storedPath);
+}
+
+/** Persist bytes; returns the stored reference to record on the upload row. */
+export async function putFile(filename: string, body: Buffer): Promise<string> {
+  if (driver() === "blob") {
+    const { put } = await import("@vercel/blob");
+    const { url } = await put(`uploads/${randomUUID()}-${filename}`, body, {
+      access: "public",
+      addRandomSuffix: false,
+    });
+    return url;
+  }
+  await mkdir(UPLOAD_DIR, { recursive: true });
+  const dest = path.join(UPLOAD_DIR, `${randomUUID()}-${filename}`);
+  await writeFile(dest, body);
+  return dest;
+}
+
+export interface Materialized {
+  /** Local filesystem path the Python parser can open. */
+  path: string;
+  /** Removes the temp copy, if one was made. Safe to call unconditionally. */
+  cleanup: () => Promise<void>;
+}
+
+/**
+ * Give the parser a real file on local disk. Local refs are used in place;
+ * remote refs are fetched to a temp file the caller must clean up.
+ */
+export async function materialize(storedPath: string): Promise<Materialized> {
+  if (!isRemote(storedPath)) {
+    return { path: storedPath, cleanup: async () => {} };
+  }
+  const res = await fetch(storedPath);
+  if (!res.ok) {
+    throw new Error(`could not fetch stored file ${storedPath}: ${res.status}`);
+  }
+  const name = path.basename(new URL(storedPath).pathname) || "workbook";
+  const tmp = path.join(os.tmpdir(), `${randomUUID()}-${name}`);
+  await writeFile(tmp, Buffer.from(await res.arrayBuffer()));
+  return {
+    path: tmp,
+    cleanup: async () => {
+      await unlink(tmp).catch(() => {});
+    },
+  };
+}

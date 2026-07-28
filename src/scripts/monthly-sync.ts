@@ -4,25 +4,21 @@
 //
 // Run: npm run sync:monthly
 import "dotenv/config";
-import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
-import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { uploads } from "@/db/schema";
 import { enabledSources } from "@/lib/fetcher/amcs";
-import { downloadFile } from "@/lib/fetcher/headless";
+import { fetchFile } from "@/lib/fetcher/headless";
+import { putFile } from "@/lib/storage";
 import { runParser } from "@/lib/parser";
 import { ingestFund } from "@/lib/ingest";
 import { isTopFund } from "@/lib/fetcher/topfunds";
 import { recomputeAllSignals } from "@/lib/signals";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const log = (m: string) => console.log(`[monthly-sync] ${m}`);
 
 async function main() {
   log(`start ${new Date().toISOString()}`);
-  await mkdir(UPLOAD_DIR, { recursive: true });
 
   let files = 0;
   let funds = 0;
@@ -39,13 +35,18 @@ async function main() {
     log(`${src.amc}: ${items.length} files`);
 
     for (const item of items) {
-      const dest = path.join(UPLOAD_DIR, `${randomUUID()}-${item.filename}`);
+      // Row goes in first so a failed download still leaves an error trail;
+      // the stored ref is only known once the bytes are persisted.
       const [row] = await db
         .insert(uploads)
-        .values({ filename: item.filename, storedPath: dest, status: "parsing" })
+        .values({ filename: item.filename, storedPath: "", status: "parsing" })
         .returning({ id: uploads.id });
       try {
-        await downloadFile(item.url, dest);
+        const dest = await putFile(item.filename, await fetchFile(item.url));
+        await db
+          .update(uploads)
+          .set({ storedPath: dest })
+          .where(eq(uploads.id, row.id));
         const parsed = await runParser(dest, item.fundNameHint, src.amc);
         const top = parsed.filter((f) => isTopFund(f.amc, f.fund_name));
         let n = 0;

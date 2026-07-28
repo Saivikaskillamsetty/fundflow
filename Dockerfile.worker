@@ -1,0 +1,35 @@
+# The ingest half of FundFlow: BullMQ worker, Python holdings extractor, and
+# headless Chrome for AMC discovery. None of these fit in a serverless function,
+# so they run here while Next.js is deployed separately (Vercel).
+#
+# Build:  docker build -f Dockerfile.worker -t fundflow-worker .
+# Run:    docker run --env-file .env.production fundflow-worker
+FROM node:24-slim
+
+# Chromium for puppeteer-core discovery, Python for parser/extract.py.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      chromium \
+      python3 \
+      python3-venv \
+      ca-certificates \
+      fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CHROME_PATH=/usr/bin/chromium
+ENV PYTHON_BIN=/opt/parser-venv/bin/python
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# Node deps first so dependency layers cache across source edits.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY parser/requirements.txt ./parser/requirements.txt
+RUN python3 -m venv /opt/parser-venv \
+    && /opt/parser-venv/bin/pip install --no-cache-dir -r parser/requirements.txt
+
+COPY . .
+
+# tsx runs the TypeScript worker directly — no separate build step needed.
+CMD ["npx", "tsx", "src/worker.ts"]

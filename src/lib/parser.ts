@@ -5,6 +5,7 @@ import { execFile } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { ParsedFund } from "@/lib/ingest";
+import { materialize } from "@/lib/storage";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,17 +22,24 @@ export async function runParser(
   const python = process.env.PYTHON_BIN || "python3";
   const script = path.join(process.cwd(), "parser", "extract.py");
 
-  const args = [script, filePath];
-  if (fundNameHint || amcHint) args.push(fundNameHint ?? "");
-  if (amcHint) args.push(amcHint);
-  const { stdout } = await execFileAsync(
-    python,
-    args,
-    { maxBuffer: 128 * 1024 * 1024 },
-  ).catch((err: { stdout?: string; stderr?: string; message: string }) => {
-    if (err.stdout) return { stdout: err.stdout };
-    throw new Error(err.stderr || err.message);
-  });
+  // extract.py opens a real file, so blob-backed refs need a local temp copy.
+  const file = await materialize(filePath);
+  let stdout: string;
+  try {
+    const args = [script, file.path];
+    if (fundNameHint || amcHint) args.push(fundNameHint ?? "");
+    if (amcHint) args.push(amcHint);
+    ({ stdout } = await execFileAsync(
+      python,
+      args,
+      { maxBuffer: 128 * 1024 * 1024 },
+    ).catch((err: { stdout?: string; stderr?: string; message: string }) => {
+      if (err.stdout) return { stdout: err.stdout };
+      throw new Error(err.stderr || err.message);
+    }));
+  } finally {
+    await file.cleanup();
+  }
 
   let parsed: unknown;
   try {

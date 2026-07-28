@@ -4,14 +4,12 @@
 // Run: npm run backfill -- 4
 //      npm run backfill -- 6 "Tata,Quant"
 import "dotenv/config";
-import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
-import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { uploads } from "@/db/schema";
 import { enabledSources } from "@/lib/fetcher/amcs";
-import { downloadFile } from "@/lib/fetcher/headless";
+import { fetchFile } from "@/lib/fetcher/headless";
+import { putFile } from "@/lib/storage";
 import { runParser } from "@/lib/parser";
 import { ingestFund } from "@/lib/ingest";
 import { isTopFund } from "@/lib/fetcher/topfunds";
@@ -22,12 +20,10 @@ const AMC_FILTER = (process.argv[3] || "")
   .split(",")
   .map((s) => s.trim().toLowerCase())
   .filter(Boolean);
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const log = (m: string) => console.log(`[backfill] ${m}`);
 
 async function main() {
   log(`fetching latest ${MONTHS} months for all enabled AMCs`);
-  await mkdir(UPLOAD_DIR, { recursive: true });
   let files = 0, funds = 0, holdings = 0;
 
   const sources = enabledSources().filter(
@@ -43,13 +39,13 @@ async function main() {
     }
     log(`${src.amc}: ${items.length} files`);
     for (const item of items) {
-      const dest = path.join(UPLOAD_DIR, `${randomUUID()}-${item.filename}`);
       const [row] = await db
         .insert(uploads)
-        .values({ filename: item.filename, storedPath: dest, status: "parsing" })
+        .values({ filename: item.filename, storedPath: "", status: "parsing" })
         .returning({ id: uploads.id });
       try {
-        await downloadFile(item.url, dest);
+        const dest = await putFile(item.filename, await fetchFile(item.url));
+        await db.update(uploads).set({ storedPath: dest }).where(eq(uploads.id, row.id));
         const parsed = await runParser(dest, item.fundNameHint, src.amc);
         const top = parsed.filter((f) => isTopFund(f.amc, f.fund_name));
         let n = 0;

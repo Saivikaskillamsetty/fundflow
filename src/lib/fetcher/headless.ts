@@ -36,12 +36,17 @@ export async function discoverLinks(
   }
 }
 
-/** Download a file URL to disk (plain fetch with a browser UA). */
-export async function downloadFile(url: string, destPath: string): Promise<number> {
-  const { writeFile } = await import("node:fs/promises");
+/** Fetch a file URL into memory (plain fetch with a browser UA). */
+export async function fetchFile(url: string): Promise<Buffer> {
   const res = await fetch(url, { headers: { "user-agent": UA } });
   if (!res.ok) throw new Error(`download failed ${res.status} for ${url}`);
-  const buf = Buffer.from(await res.arrayBuffer());
+  return Buffer.from(await res.arrayBuffer());
+}
+
+/** Download a file URL straight to disk. */
+export async function downloadFile(url: string, destPath: string): Promise<number> {
+  const { writeFile } = await import("node:fs/promises");
+  const buf = await fetchFile(url);
   await writeFile(destPath, buf);
   return buf.length;
 }

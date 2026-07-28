@@ -1,15 +1,11 @@
 // Sync orchestrator: discover → download → enqueue the latest N months of
 // monthly portfolios for each enabled AMC. Reuses the existing parse pipeline.
-import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
-import path from "node:path";
 import { db } from "@/db";
 import { uploads } from "@/db/schema";
 import { parseQueue } from "@/lib/queue";
-import { downloadFile } from "@/lib/fetcher/headless";
+import { fetchFile } from "@/lib/fetcher/headless";
+import { putFile } from "@/lib/storage";
 import { enabledSources, type AmcSource } from "@/lib/fetcher/amcs";
-
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
 export interface SyncResult {
   amc: string;
@@ -32,12 +28,9 @@ async function syncSource(src: AmcSource): Promise<SyncResult> {
     res.errors.push("no files discovered");
     return res;
   }
-  await mkdir(UPLOAD_DIR, { recursive: true });
-
   for (const item of items) {
     try {
-      const dest = path.join(UPLOAD_DIR, `${randomUUID()}-${item.filename}`);
-      await downloadFile(item.url, dest);
+      const dest = await putFile(item.filename, await fetchFile(item.url));
       const [row] = await db
         .insert(uploads)
         .values({ filename: item.filename, storedPath: dest, status: "queued" })

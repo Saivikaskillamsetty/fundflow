@@ -59,12 +59,8 @@ export default function UploadPage() {
       const res = await fetch("/api/sync", { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "sync failed");
-      type R = { amc: string; queued: number; failed: number; errors: string[] };
-      const total = (data.results as R[]).reduce((a, r) => a + r.queued, 0);
-      const detail = (data.results as R[])
-        .map((r) => `${r.amc.split(" ")[0]} ${r.queued}✓${r.failed ? `/${r.failed}✗` : ""}`)
-        .join("  ·  ");
-      setSyncMsg(`Queued ${total} file(s) — ${detail}`);
+      // The worker does discovery + downloads; rows appear here as it goes.
+      setSyncMsg("Sync started on the worker — files will appear below as they download.");
       await refresh();
     } catch (e) {
       setSyncMsg(e instanceof Error ? e.message : String(e));

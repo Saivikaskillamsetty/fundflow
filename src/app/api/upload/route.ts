@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { db } from "@/db";
 import { uploads } from "@/db/schema";
 import { parseQueue } from "@/lib/queue";
+import { putFile } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const ALLOWED = /\.(pdf|xlsx|xls)$/i;
 
 export async function POST(request: Request) {
@@ -18,7 +15,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
   const created: { id: number; filename: string }[] = [];
 
   for (const file of files) {
@@ -37,9 +33,8 @@ export async function POST(request: Request) {
       continue;
     }
 
-    const storedPath = path.join(UPLOAD_DIR, `${randomUUID()}-${file.name}`);
     const buf = Buffer.from(await file.arrayBuffer());
-    await writeFile(storedPath, buf);
+    const storedPath = await putFile(file.name, buf);
 
     const [row] = await db
       .insert(uploads)
