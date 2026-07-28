@@ -1,0 +1,5 @@
+pdfplumber==0.11.8
+pymupdf
+pandas
+openpyxl
+reportlab

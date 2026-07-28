@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# fundflow
+.env
+uploads/
+parser/.venv/
+__pycache__/
+*.pyc
+drizzle/meta/_journal.json.bak
+
+# local run artifacts
+logs/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

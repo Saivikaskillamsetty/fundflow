@@ -1,0 +1,1662 @@
+[
+  {
+    "amc": "SBI Mutual Fund",
+    "fund_name": "SBI Bluechip Fund",
+    "category": "Large Cap",
+    "report_month": "2026-04",
+    "source_file": "sbi_bluechip_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 8.39,
+        "market_value": 11185.9,
+        "shares_held": 1245289
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 7.64,
+        "market_value": 7610.54,
+        "shares_held": 832231
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 6.69,
+        "market_value": 7434.65,
+        "shares_held": 620649
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 6.37,
+        "market_value": 7069.17,
+        "shares_held": 866995
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 6.26,
+        "market_value": 5857.49,
+        "shares_held": 843120
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.76,
+        "market_value": 5889.06,
+        "shares_held": 706931
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 4.45,
+        "market_value": 6057.11,
+        "shares_held": 400438
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 4.37,
+        "market_value": 5832.42,
+        "shares_held": 446855
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 3.85,
+        "market_value": 5070.66,
+        "shares_held": 447650
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 3.58,
+        "market_value": 3299.78,
+        "shares_held": 362158
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 3.08,
+        "market_value": 3947.78,
+        "shares_held": 299453
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 2.74,
+        "market_value": 3234.91,
+        "shares_held": 351162
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 2.22,
+        "market_value": 2741.89,
+        "shares_held": 240696
+      },
+      {
+        "stock_name": "ICICI Bank Ltd",
+        "isin": "INE090A01021",
+        "sector": "Banks",
+        "holding_pct": 1.77,
+        "market_value": 1910.7,
+        "shares_held": 195397
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 1.59,
+        "market_value": 1930.77,
+        "shares_held": 164492
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 1.52,
+        "market_value": 1955.53,
+        "shares_held": 202009
+      }
+    ]
+  },
+  {
+    "amc": "SBI Mutual Fund",
+    "fund_name": "SBI Bluechip Fund",
+    "category": "Large Cap",
+    "report_month": "2026-05",
+    "source_file": "sbi_bluechip_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 8.36,
+        "market_value": 7882.03,
+        "shares_held": 1302119
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.85,
+        "market_value": 9882.81,
+        "shares_held": 984189
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 7.54,
+        "market_value": 7187.17,
+        "shares_held": 909433
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 6.24,
+        "market_value": 5651.82,
+        "shares_held": 928901
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 5.49,
+        "market_value": 5070.33,
+        "shares_held": 479127
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.22,
+        "market_value": 7122.46,
+        "shares_held": 820317
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 4.53,
+        "market_value": 5183.69,
+        "shares_held": 579457
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 4.35,
+        "market_value": 5184.18,
+        "shares_held": 497094
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 3.79,
+        "market_value": 4855.96,
+        "shares_held": 349540
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 3.53,
+        "market_value": 4324.03,
+        "shares_held": 563430
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 3.2,
+        "market_value": 2885.19,
+        "shares_held": 296488
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 2.94,
+        "market_value": 3146.06,
+        "shares_held": 415974
+      },
+      {
+        "stock_name": "ICICI Bank Ltd",
+        "isin": "INE090A01021",
+        "sector": "Banks",
+        "holding_pct": 2.65,
+        "market_value": 3014.75,
+        "shares_held": 239218
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 1.84,
+        "market_value": 2562.5,
+        "shares_held": 200630
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 1.56,
+        "market_value": 1610.61,
+        "shares_held": 182064
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 0.73,
+        "market_value": 797.44,
+        "shares_held": 93230
+      }
+    ]
+  },
+  {
+    "amc": "HDFC Mutual Fund",
+    "fund_name": "HDFC Flexi Cap Fund",
+    "category": "Flexi Cap",
+    "report_month": "2026-04",
+    "source_file": "hdfc_flexi_cap_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 8.18,
+        "market_value": 9635.09,
+        "shares_held": 1305804
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 7.92,
+        "market_value": 10538.94,
+        "shares_held": 914367
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.79,
+        "market_value": 7286.99,
+        "shares_held": 1158924
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 7.37,
+        "market_value": 8422.59,
+        "shares_held": 687657
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 7.27,
+        "market_value": 9910.34,
+        "shares_held": 1145168
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 6.88,
+        "market_value": 7647.15,
+        "shares_held": 800836
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 6.05,
+        "market_value": 5742.71,
+        "shares_held": 960335
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 5.13,
+        "market_value": 7180.16,
+        "shares_held": 431161
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 4.55,
+        "market_value": 5932.06,
+        "shares_held": 649601
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 4.18,
+        "market_value": 5285.77,
+        "shares_held": 490573
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 4.16,
+        "market_value": 4263.6,
+        "shares_held": 425499
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 4.02,
+        "market_value": 5349.96,
+        "shares_held": 430719
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 3.84,
+        "market_value": 3965.19,
+        "shares_held": 609886
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 2.86,
+        "market_value": 3215.52,
+        "shares_held": 272319
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 2.79,
+        "market_value": 2809.86,
+        "shares_held": 372515
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 2.6,
+        "market_value": 2416.23,
+        "shares_held": 291416
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 2.43,
+        "market_value": 2710.73,
+        "shares_held": 213243
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 1.99,
+        "market_value": 2359.19,
+        "shares_held": 308133
+      }
+    ]
+  },
+  {
+    "amc": "HDFC Mutual Fund",
+    "fund_name": "HDFC Flexi Cap Fund",
+    "category": "Flexi Cap",
+    "report_month": "2026-05",
+    "source_file": "hdfc_flexi_cap_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 9.19,
+        "market_value": 10888.66,
+        "shares_held": 1427461
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 8.98,
+        "market_value": 8996.15,
+        "shares_held": 1233932
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 8.58,
+        "market_value": 11538.87,
+        "shares_held": 867929
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 8.21,
+        "market_value": 8151.81,
+        "shares_held": 709417
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 7.46,
+        "market_value": 6806.45,
+        "shares_held": 1122829
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 7.4,
+        "market_value": 9683.29,
+        "shares_held": 596631
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 7.3,
+        "market_value": 7159.77,
+        "shares_held": 1156202
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 6.2,
+        "market_value": 7505.59,
+        "shares_held": 500620
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.58,
+        "market_value": 5387.15,
+        "shares_held": 564970
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 5.08,
+        "market_value": 5647.88,
+        "shares_held": 443910
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 4.9,
+        "market_value": 4924.69,
+        "shares_held": 744378
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.67,
+        "market_value": 6265.05,
+        "shares_held": 401711
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 4.21,
+        "market_value": 4693.7,
+        "shares_held": 522890
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 4.15,
+        "market_value": 4862.18,
+        "shares_held": 477477
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 2.86,
+        "market_value": 3908.56,
+        "shares_held": 289477
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 2.56,
+        "market_value": 2973.16,
+        "shares_held": 324336
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 2.47,
+        "market_value": 3224.28,
+        "shares_held": 368339
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 1.6,
+        "market_value": 2039.58,
+        "shares_held": 252651
+      }
+    ]
+  },
+  {
+    "amc": "ICICI Prudential Mutual Fund",
+    "fund_name": "ICICI Prudential Bluechip Fund",
+    "category": "Large Cap",
+    "report_month": "2026-04",
+    "source_file": "icici_prudential_bluechip_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 8.12,
+        "market_value": 9838.01,
+        "shares_held": 1247732
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.05,
+        "market_value": 9659.43,
+        "shares_held": 951387
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 6.9,
+        "market_value": 9605.61,
+        "shares_held": 792889
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 6.53,
+        "market_value": 7285.19,
+        "shares_held": 625331
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 6.23,
+        "market_value": 6204.58,
+        "shares_held": 774719
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.98,
+        "market_value": 8073.14,
+        "shares_held": 538020
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 5.95,
+        "market_value": 6183.84,
+        "shares_held": 665669
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 4.82,
+        "market_value": 6371.22,
+        "shares_held": 647622
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 4.8,
+        "market_value": 5102.84,
+        "shares_held": 640086
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 3.48,
+        "market_value": 4658.05,
+        "shares_held": 286083
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 2.96,
+        "market_value": 4119.65,
+        "shares_held": 374283
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 1.87,
+        "market_value": 1860.72,
+        "shares_held": 284165
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 1.52,
+        "market_value": 1634.87,
+        "shares_held": 215636
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 1.33,
+        "market_value": 1542.75,
+        "shares_held": 152796
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 1.29,
+        "market_value": 1383.97,
+        "shares_held": 164766
+      }
+    ]
+  },
+  {
+    "amc": "ICICI Prudential Mutual Fund",
+    "fund_name": "ICICI Prudential Bluechip Fund",
+    "category": "Large Cap",
+    "report_month": "2026-05",
+    "source_file": "icici_prudential_bluechip_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 8.6,
+        "market_value": 8681.02,
+        "shares_held": 1223553
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 7.69,
+        "market_value": 9686.61,
+        "shares_held": 992103
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 7.48,
+        "market_value": 7596.92,
+        "shares_held": 681203
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.05,
+        "market_value": 9335.39,
+        "shares_held": 704547
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 6.2,
+        "market_value": 6818.92,
+        "shares_held": 686453
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.97,
+        "market_value": 5431.3,
+        "shares_held": 929439
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 5.76,
+        "market_value": 7239.01,
+        "shares_held": 663493
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 4.84,
+        "market_value": 6655.1,
+        "shares_held": 617759
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 4.56,
+        "market_value": 4270.05,
+        "shares_held": 674784
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 3.51,
+        "market_value": 3307.82,
+        "shares_held": 328449
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 2.94,
+        "market_value": 3583.36,
+        "shares_held": 293350
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 2.78,
+        "market_value": 3161.8,
+        "shares_held": 387788
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 2.49,
+        "market_value": 2545.83,
+        "shares_held": 204065
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 2.44,
+        "market_value": 2470.06,
+        "shares_held": 326529
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 0.4,
+        "market_value": 453.18,
+        "shares_held": 42588
+      }
+    ]
+  },
+  {
+    "amc": "Axis Mutual Fund",
+    "fund_name": "Axis Growth Opportunities Fund",
+    "category": "Large & Mid Cap",
+    "report_month": "2026-04",
+    "source_file": "axis_growth_opportunities_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 8.5,
+        "market_value": 10413.11,
+        "shares_held": 917973
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 8.24,
+        "market_value": 7521.8,
+        "shares_held": 730458
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 8.12,
+        "market_value": 7390.74,
+        "shares_held": 779104
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 6.86,
+        "market_value": 8761.02,
+        "shares_held": 906482
+      },
+      {
+        "stock_name": "ICICI Bank Ltd",
+        "isin": "INE090A01021",
+        "sector": "Banks",
+        "holding_pct": 6.75,
+        "market_value": 8124.46,
+        "shares_held": 630606
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 6.64,
+        "market_value": 6813.54,
+        "shares_held": 973118
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 6.61,
+        "market_value": 8656.79,
+        "shares_held": 589364
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 5.82,
+        "market_value": 6581.54,
+        "shares_held": 528781
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 5.23,
+        "market_value": 6536.1,
+        "shares_held": 509596
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.03,
+        "market_value": 4568.79,
+        "shares_held": 375610
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 3.96,
+        "market_value": 3617.66,
+        "shares_held": 495599
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 3.45,
+        "market_value": 3758.99,
+        "shares_held": 486099
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 2.14,
+        "market_value": 2642.32,
+        "shares_held": 192809
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 1.96,
+        "market_value": 1790.43,
+        "shares_held": 254369
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 1.61,
+        "market_value": 1883.23,
+        "shares_held": 131296
+      },
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 1.38,
+        "market_value": 1388.05,
+        "shares_held": 152253
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 1.22,
+        "market_value": 1512.28,
+        "shares_held": 130406
+      }
+    ]
+  },
+  {
+    "amc": "Axis Mutual Fund",
+    "fund_name": "Axis Growth Opportunities Fund",
+    "category": "Large & Mid Cap",
+    "report_month": "2026-05",
+    "source_file": "axis_growth_opportunities_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 9.23,
+        "market_value": 12803.37,
+        "shares_held": 940951
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 8.44,
+        "market_value": 10050.16,
+        "shares_held": 881950
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 8.23,
+        "market_value": 8854.7,
+        "shares_held": 1020775
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 7.82,
+        "market_value": 8800.64,
+        "shares_held": 800097
+      },
+      {
+        "stock_name": "ICICI Bank Ltd",
+        "isin": "INE090A01021",
+        "sector": "Banks",
+        "holding_pct": 7.39,
+        "market_value": 9835.07,
+        "shares_held": 740465
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 7.18,
+        "market_value": 9047.07,
+        "shares_held": 623576
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 6.88,
+        "market_value": 7733.72,
+        "shares_held": 942198
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 6.57,
+        "market_value": 8703.86,
+        "shares_held": 704951
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 5.04,
+        "market_value": 5633.65,
+        "shares_held": 598146
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 4.42,
+        "market_value": 5858.61,
+        "shares_held": 363748
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.03,
+        "market_value": 5255.52,
+        "shares_held": 409474
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 3.03,
+        "market_value": 2745.58,
+        "shares_held": 267267
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 2.97,
+        "market_value": 3112.93,
+        "shares_held": 435432
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 2.96,
+        "market_value": 3546.31,
+        "shares_held": 303023
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 2.55,
+        "market_value": 2647.54,
+        "shares_held": 354675
+      },
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 1.35,
+        "market_value": 1295.7,
+        "shares_held": 128799
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 1.27,
+        "market_value": 1434.93,
+        "shares_held": 192184
+      }
+    ]
+  },
+  {
+    "amc": "Nippon India Mutual Fund",
+    "fund_name": "Nippon India Large Cap Fund",
+    "category": "Large Cap",
+    "report_month": "2026-04",
+    "source_file": "nippon_india_large_cap_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 8.0,
+        "market_value": 9378.25,
+        "shares_held": 912088
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 6.91,
+        "market_value": 8503.39,
+        "shares_held": 898332
+      },
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 6.73,
+        "market_value": 8717.84,
+        "shares_held": 864841
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 6.62,
+        "market_value": 6913.3,
+        "shares_held": 831052
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 6.55,
+        "market_value": 6575.51,
+        "shares_held": 1020537
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 5.86,
+        "market_value": 7696.03,
+        "shares_held": 894663
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 4.41,
+        "market_value": 6006.22,
+        "shares_held": 595309
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 4.38,
+        "market_value": 4579.86,
+        "shares_held": 558471
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.32,
+        "market_value": 6026.47,
+        "shares_held": 642873
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 3.29,
+        "market_value": 3963.84,
+        "shares_held": 426654
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 2.74,
+        "market_value": 3429.09,
+        "shares_held": 374164
+      },
+      {
+        "stock_name": "ICICI Bank Ltd",
+        "isin": "INE090A01021",
+        "sector": "Banks",
+        "holding_pct": 2.69,
+        "market_value": 3026.94,
+        "shares_held": 327657
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 2.58,
+        "market_value": 2524.6,
+        "shares_held": 342712
+      },
+      {
+        "stock_name": "Kotak Mahindra Bank Ltd",
+        "isin": "INE237A01028",
+        "sector": "Banks",
+        "holding_pct": 2.3,
+        "market_value": 2073.08,
+        "shares_held": 197811
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 1.93,
+        "market_value": 2412.24,
+        "shares_held": 260731
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 1.54,
+        "market_value": 1622.86,
+        "shares_held": 143641
+      }
+    ]
+  },
+  {
+    "amc": "Nippon India Mutual Fund",
+    "fund_name": "Nippon India Large Cap Fund",
+    "category": "Large Cap",
+    "report_month": "2026-05",
+    "source_file": "nippon_india_large_cap_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 9.4,
+        "market_value": 11828.04,
+        "shares_held": 1126778
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.1,
+        "market_value": 8004.63,
+        "shares_held": 880454
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 6.59,
+        "market_value": 5939.45,
+        "shares_held": 668053
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 6.45,
+        "market_value": 7675.25,
+        "shares_held": 948137
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 6.17,
+        "market_value": 6543.46,
+        "shares_held": 695160
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 5.27,
+        "market_value": 6916.68,
+        "shares_held": 786246
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 3.95,
+        "market_value": 3813.75,
+        "shares_held": 400389
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 3.8,
+        "market_value": 5305.29,
+        "shares_held": 332335
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 3.77,
+        "market_value": 4432.13,
+        "shares_held": 375109
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 3.64,
+        "market_value": 4341.3,
+        "shares_held": 344049
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 3.16,
+        "market_value": 3609.84,
+        "shares_held": 475478
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 2.88,
+        "market_value": 3112.96,
+        "shares_held": 273619
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 2.85,
+        "market_value": 3911.9,
+        "shares_held": 293713
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 2.3,
+        "market_value": 2387.68,
+        "shares_held": 342980
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 1.61,
+        "market_value": 2063.3,
+        "shares_held": 203020
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 1.22,
+        "market_value": 1585.58,
+        "shares_held": 159090
+      }
+    ]
+  },
+  {
+    "amc": "Kotak Mutual Fund",
+    "fund_name": "Kotak Equity Opportunities Fund",
+    "category": "Large & Mid Cap",
+    "report_month": "2026-04",
+    "source_file": "kotak_equity_opportunities_fund_2026-04.pdf",
+    "holdings": [
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 7.54,
+        "market_value": 7043.95,
+        "shares_held": 624854
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 7.52,
+        "market_value": 8423.55,
+        "shares_held": 1127512
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 7.39,
+        "market_value": 8055.13,
+        "shares_held": 1099243
+      },
+      {
+        "stock_name": "UltraTech Cement Ltd",
+        "isin": "INE481G01011",
+        "sector": "Cement",
+        "holding_pct": 7.16,
+        "market_value": 8217.28,
+        "shares_held": 1134612
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.09,
+        "market_value": 8733.78,
+        "shares_held": 786183
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 6.6,
+        "market_value": 6264.86,
+        "shares_held": 757136
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 6.2,
+        "market_value": 8220.47,
+        "shares_held": 818318
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 5.73,
+        "market_value": 8014.63,
+        "shares_held": 880553
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 5.29,
+        "market_value": 6812.32,
+        "shares_held": 522043
+      },
+      {
+        "stock_name": "Bharti Airtel Ltd",
+        "isin": "INE397D01024",
+        "sector": "Telecom - Services",
+        "holding_pct": 4.94,
+        "market_value": 6230.44,
+        "shares_held": 575777
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 4.52,
+        "market_value": 4833.15,
+        "shares_held": 712064
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.07,
+        "market_value": 3977.13,
+        "shares_held": 538796
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 3.37,
+        "market_value": 4312.59,
+        "shares_held": 463366
+      },
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 1.33,
+        "market_value": 1665.98,
+        "shares_held": 185636
+      },
+      {
+        "stock_name": "Hindustan Unilever Ltd",
+        "isin": "INE030A01027",
+        "sector": "Diversified FMCG",
+        "holding_pct": 1.28,
+        "market_value": 1529.72,
+        "shares_held": 153834
+      }
+    ]
+  },
+  {
+    "amc": "Kotak Mutual Fund",
+    "fund_name": "Kotak Equity Opportunities Fund",
+    "category": "Large & Mid Cap",
+    "report_month": "2026-05",
+    "source_file": "kotak_equity_opportunities_fund_2026-05.pdf",
+    "holdings": [
+      {
+        "stock_name": "Infosys Ltd",
+        "isin": "INE009A01021",
+        "sector": "IT - Software",
+        "holding_pct": 8.48,
+        "market_value": 10216.25,
+        "shares_held": 797167
+      },
+      {
+        "stock_name": "Tata Motors Ltd",
+        "isin": "INE155A01022",
+        "sector": "Automobiles",
+        "holding_pct": 7.83,
+        "market_value": 10307.56,
+        "shares_held": 1093175
+      },
+      {
+        "stock_name": "State Bank of India",
+        "isin": "INE062A01020",
+        "sector": "Banks",
+        "holding_pct": 7.42,
+        "market_value": 9661.7,
+        "shares_held": 1110267
+      },
+      {
+        "stock_name": "Sun Pharmaceutical Industries Ltd",
+        "isin": "INE044A01036",
+        "sector": "Pharmaceuticals",
+        "holding_pct": 7.09,
+        "market_value": 8015.78,
+        "shares_held": 648376
+      },
+      {
+        "stock_name": "Larsen & Toubro Ltd",
+        "isin": "INE018A01030",
+        "sector": "Construction",
+        "holding_pct": 6.99,
+        "market_value": 8659.25,
+        "shares_held": 1063156
+      },
+      {
+        "stock_name": "HDFC Bank Ltd",
+        "isin": "INE040A01034",
+        "sector": "Banks",
+        "holding_pct": 5.43,
+        "market_value": 5584.67,
+        "shares_held": 795157
+      },
+      {
+        "stock_name": "Reliance Industries Ltd",
+        "isin": "INE002A01018",
+        "sector": "Petroleum Products",
+        "holding_pct": 5.41,
+        "market_value": 6016.76,
+        "shares_held": 709332
+      },
+      {
+        "stock_name": "Axis Bank Ltd",
+        "isin": "INE238A01034",
+        "sector": "Banks",
+        "holding_pct": 5.08,
+        "market_value": 4907.69,
+        "shares_held": 477780
+      },
+      {
+        "stock_name": "Asian Paints Ltd",
+        "isin": "INE021A01026",
+        "sector": "Consumer Durables",
+        "holding_pct": 4.85,
+        "market_value": 5249.79,
+        "shares_held": 400945
+      },
+      {
+        "stock_name": "Maruti Suzuki India Ltd",
+        "isin": "INE585B01010",
+        "sector": "Automobiles",
+        "holding_pct": 4.55,
+        "market_value": 5524.26,
+        "shares_held": 669154
+      },
+      {
+        "stock_name": "Titan Company Ltd",
+        "isin": "INE280A01028",
+        "sector": "Consumer Durables",
+        "holding_pct": 4.23,
+        "market_value": 4032.57,
+        "shares_held": 627168
+      },
+      {
+        "stock_name": "Bajaj Finance Ltd",
+        "isin": "INE296A01024",
+        "sector": "Finance",
+        "holding_pct": 4.08,
+        "market_value": 5658.15,
+        "shares_held": 580440
+      },
+      {
+        "stock_name": "NTPC Ltd",
+        "isin": "INE733E01010",
+        "sector": "Power",
+        "holding_pct": 3.35,
+        "market_value": 4653.06,
+        "shares_held": 347121
+      },
+      {
+        "stock_name": "ITC Ltd",
+        "isin": "INE154A01025",
+        "sector": "Diversified FMCG",
+        "holding_pct": 2.18,
+        "market_value": 2338.67,
+        "shares_held": 251437
+      },
+      {
+        "stock_name": "Tata Consultancy Services Ltd",
+        "isin": "INE467B01029",
+        "sector": "IT - Software",
+        "holding_pct": 0.4,
+        "market_value": 398.03,
+        "shares_held": 39008
+      }
+    ]
+  }
+]
