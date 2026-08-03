@@ -30,6 +30,16 @@ export async function fanoutSync(
       if (!res.ok) {
         throw new Error(`${src.amc}: HTTP ${res.status}`);
       }
+      // Deployment protection answers with an HTML login page and a 200, so a
+      // bare .json() surfaces as "Unexpected token '<'" — which says nothing
+      // about the actual cause. Name it instead.
+      const type = res.headers?.get?.("content-type") ?? "";
+      if (!type.includes("application/json")) {
+        throw new Error(
+          `${src.amc}: expected JSON, got ${type || "unknown"} — the self-call is ` +
+            `probably hitting deployment protection rather than the function`,
+        );
+      }
       return (await res.json()) as SyncResult;
     }),
   );
