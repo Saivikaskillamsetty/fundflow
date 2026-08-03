@@ -1,6 +1,15 @@
 # Deploying FundFlow
 
-Live: **https://fundflow-beta.vercel.app**
+Live: **https://fundflow-intelligence.vercel.app**
+
+`fundflow-beta.vercel.app` still resolves to the same deployment and is kept as
+an alias so older links do not break. `fundflow.vercel.app` is unavailable —
+vercel.app subdomains are globally unique and that one belongs to another
+account.
+
+Both are custom domains, which matters: deployment protection on this project is
+`all_except_custom_domains`, so both are exempt while the raw deployment URL is
+not. `selfOrigin()` depends on that (see below).
 
 Everything runs on Vercel in a single project — the Next.js app, the Python
 holdings parser, and the monthly ingestion cron.
@@ -122,7 +131,7 @@ default 12). Anything more frequent fails at deploy time on Hobby.
 Trigger a run by hand:
 
 ```bash
-curl "https://fundflow-beta.vercel.app/api/cron/sync?force=1" \
+curl "https://fundflow-intelligence.vercel.app/api/cron/sync?force=1" \
   -H "authorization: Bearer $CRON_SECRET"
 ```
 

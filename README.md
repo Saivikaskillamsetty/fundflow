@@ -123,7 +123,7 @@ It fans out to one function invocation per AMC, in parallel, so wall time is the
 slowest AMC rather than the sum. Trigger a run by hand:
 
 ```bash
-curl "https://fundflow-beta.vercel.app/api/cron/sync?force=1" \
+curl "https://fundflow-intelligence.vercel.app/api/cron/sync?force=1" \
   -H "authorization: Bearer $CRON_SECRET"
 ```
 
