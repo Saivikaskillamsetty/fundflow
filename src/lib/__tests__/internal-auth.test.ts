@@ -77,7 +77,7 @@ describe("selfOrigin", () => {
   it("uses VERCEL_URL on a preview — its own code, not production's", () => {
     process.env.VERCEL_ENV = "preview";
     process.env.VERCEL_URL = "fundflow-abc123.vercel.app";
-    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-beta.vercel.app";
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-intelligence.vercel.app";
     expect(selfOrigin(req())).toBe("https://fundflow-abc123.vercel.app");
   });
 
@@ -87,8 +87,8 @@ describe("selfOrigin", () => {
     // and every AMC fails on a JSON parse.
     process.env.VERCEL_ENV = "production";
     process.env.VERCEL_URL = "fundflow-bbyvhqx8g.vercel.app";
-    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-beta.vercel.app";
-    expect(selfOrigin(req())).toBe("https://fundflow-beta.vercel.app");
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-intelligence.vercel.app";
+    expect(selfOrigin(req())).toBe("https://fundflow-intelligence.vercel.app");
   });
 
   it("falls back to VERCEL_URL if production has no custom domain", () => {
