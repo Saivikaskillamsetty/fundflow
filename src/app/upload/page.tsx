@@ -65,39 +65,12 @@ export default function UploadPage() {
 
   const pending = rows.some((r) => r.status === "queued" || r.status === "parsing");
 
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState<string | null>(null);
-  const sync = useCallback(async () => {
-    setSyncing(true);
-    setSyncMsg(null);
-    try {
-      const res = await fetch("/api/sync", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "sync failed");
-      // The worker does discovery + downloads; rows appear here as it goes.
-      setSyncMsg("Sync started on the worker — files will appear below as they download.");
-      await refresh();
-    } catch (e) {
-      setSyncMsg(e instanceof Error ? e.message : String(e));
-    } finally {
-      setSyncing(false);
-    }
-  }, [refresh]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold">Upload Fact Sheets</h1>
-        <button
-          onClick={sync}
-          disabled={syncing}
-          className="rounded border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs text-accent hover:bg-accent/20 disabled:opacity-50"
-          title="Fetch latest monthly portfolios from AMC sites (headless)"
-        >
-          {syncing ? "Syncing latest…" : "⟳ Sync latest from AMCs"}
-        </button>
       </div>
-      {syncMsg && <div className="text-xs text-muted">{syncMsg}</div>}
 
       <div
         onDragOver={(e) => {

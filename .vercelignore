@@ -15,8 +15,11 @@ node_modules
 parser/.venv
 **/__pycache__
 *.pyc
-uploads
-logs
+# Anchored. An unanchored "uploads" matches at any depth, so it also excluded
+# src/app/api/uploads/ and that route 404'd in production while building fine
+# locally — the same mistake .gitignore made.
+/uploads
+/logs
 *.tsbuildinfo
 
 # Test corpus — the parser suite runs in CI, not in production.
