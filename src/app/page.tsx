@@ -82,7 +82,7 @@ export default async function DashboardPage({
           </Link>
         </div>
       </div>
-      {d.prevMonth === null && d.months.length > 1 && d.month === d.months[d.months.length - 1] && (
+      {d.prevMonth === null && d.months.length > 1 && (
         <div className="text-[11px] text-hold">
           Earliest month — no prior month to compare, so all positions read as new (BUY).
         </div>

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // `vercel build` writes compiled bundles here; linting them is meaningless.
+    ".vercel/**",
   ]),
 ]);
 

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/parse.py": {
+      "maxDuration": 300,
+      "memory": 2048,
+      "excludeFiles": "{.env,.env.*,node_modules/**,.next/**,.git/**,.vercel/**,uploads/**,logs/**,public/**,src/**,parser/fixtures/**,parser/.venv/**,**/__pycache__/**}"
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/sync",
+      "schedule": "0 4 * * *"
+    }
+  ]
+}

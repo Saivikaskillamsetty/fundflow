@@ -1,0 +1,28 @@
+# What never gets uploaded to Vercel.
+#
+# This matters more than it looks: the Python Function bundles every project
+# file reachable at build time, so without this the deployment carries .env and
+# .env.vercel — live Neon, Upstash and Blob credentials — inside the function
+# filesystem. Runtime configuration comes from Vercel's own environment
+# variables, never from a file in the bundle.
+.env
+.env.*
+!.env.example
+
+# Host-built artifacts and local state.
+node_modules
+.next
+parser/.venv
+**/__pycache__
+*.pyc
+uploads
+logs
+*.tsbuildinfo
+
+# Test corpus — the parser suite runs in CI, not in production.
+parser/fixtures
+**/__tests__
+
+# Local tooling.
+.claude
+.git

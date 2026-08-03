@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: npm ci
+
+      # The parser suite runs extract.py over the fixture corpus, so the venv
+      # the tests look for has to exist here too.
+      - name: Install parser dependencies
+        run: |
+          python3 -m venv parser/.venv
+          parser/.venv/bin/pip install --disable-pip-version-check -r parser/requirements.txt
+
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm test
+
+      # api/parse.py is deployed as a Python Function and is never typechecked
+      # by tsc or exercised by vitest, so a syntax error or a bad import there
+      # would only surface at deploy time.
+      - name: Check the Python function compiles and imports
+        run: |
+          parser/.venv/bin/python -m py_compile api/parse.py parser/extract.py
+          parser/.venv/bin/python -c "
+          import sys; sys.path.insert(0, 'parser')
+          sys.argv = ['parse']
+          import importlib.util
+          spec = importlib.util.spec_from_file_location('parse_fn', 'api/parse.py')
+          m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          assert hasattr(m, 'handler'), 'api/parse.py must export a handler'
+          print('api/parse.py imports cleanly')
+          "
+
+      # Build last: it is the slowest step and the least likely to be the thing
+      # that broke.
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
