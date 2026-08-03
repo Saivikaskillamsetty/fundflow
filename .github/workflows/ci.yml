@@ -49,6 +49,17 @@ jobs:
           print('api/parse.py imports cleanly')
           "
 
+      # The tests install from parser/requirements.txt; the deployed function
+      # installs from requirements.txt. Nothing links them, so they can drift —
+      # which is how xlrd ended up missing in production only.
+      - name: Check the two Python dependency lists agree
+        run: python3 scripts/check-python-deps.py
+
+      # ABSL alternates .xlsx and .xls month to month, and pandas needs xlrd for
+      # the old format. Importing it is the cheapest proof the .xls path works.
+      - name: Check legacy .xls support is installed
+        run: parser/.venv/bin/python -c "import xlrd; print('xlrd', xlrd.__version__)"
+
       # Build last: it is the slowest step and the least likely to be the thing
       # that broke.
       - name: Build
