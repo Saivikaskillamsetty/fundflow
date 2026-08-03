@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { uploads } from "@/db/schema";
 import { enabledSources } from "@/lib/fetcher/amcs";
-import { fetchFile } from "@/lib/fetcher/headless";
+import { fetchFile } from "@/lib/fetcher/http";
 import { putFile } from "@/lib/storage";
 import { runParser } from "@/lib/parser";
 import { ingestFund } from "@/lib/ingest";

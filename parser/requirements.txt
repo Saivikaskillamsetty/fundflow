@@ -3,3 +3,4 @@ pymupdf
 pandas
 openpyxl
 reportlab
+xlrd>=2.0.1

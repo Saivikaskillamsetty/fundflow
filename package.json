@@ -11,18 +11,18 @@
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "seed": "tsx --env-file=.env src/scripts/seed.ts",
-    "worker": "tsx --env-file=.env src/worker.ts",
     "sync": "tsx --env-file=.env src/scripts/sync.ts",
     "sync:monthly": "tsx --env-file=.env src/scripts/monthly-sync.ts",
-    "backfill": "tsx --env-file=.env src/scripts/backfill.ts"
+    "backfill": "tsx --env-file=.env src/scripts/backfill.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
     "@vercel/blob": "^2.6.1",
-    "bullmq": "^5.78.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
-    "ioredis": "^5.11.1",
+    "fflate": "^0.8.3",
     "next": "16.2.7",
     "postgres": "^3.4.9",
     "react": "19.2.4",
@@ -38,9 +38,9 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
-    "puppeteer-core": "^25.1.0",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,5 +1,8 @@
-// Standalone sync runner for cron. Fetches latest portfolios + enqueues parse.
-// Run: npm run sync   (worker must be running to process the jobs)
+// Standalone sync runner: discover → download → parse → ingest, sequentially
+// across every enabled AMC. Run: npm run sync
+//
+// The deployed path fans out to one function per AMC instead (see
+// src/lib/fanout.ts); this is the local/manual equivalent and needs no queue.
 import "dotenv/config";
 import { syncAll } from "@/lib/fetcher/sync";
 
@@ -8,7 +11,7 @@ async function main() {
   const results = await syncAll();
   for (const r of results) {
     console.log(
-      `[sync] ${r.amc}: queued ${r.queued}, failed ${r.failed}` +
+      `[sync] ${r.amc}: ${r.ingested} schemes, ${r.holdings} holdings, ${r.failed} failed` +
         (r.errors.length ? ` — ${r.errors[0]}` : ""),
     );
   }

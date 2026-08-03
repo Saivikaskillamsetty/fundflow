@@ -1,11 +1,12 @@
 // Per-AMC monthly-portfolio sources. Each AMC exposes data differently, so
 // each provides a `discover(months)` strategy returning the files to download.
 //
-// Verified live: Nippon (one consolidated workbook per month) and HDFC (one
-// file per scheme per month). SBI/ICICI/Axis/Kotak serve portfolios through
-// JS single-page apps / month-dropdowns with no static links — each needs a
-// bespoke interaction or reverse-engineered API and is left disabled.
-import { discoverLinks, UA } from "@/lib/fetcher/headless";
+// Everything here runs on plain HTTP. Pages that look like they need a browser
+// were doing header-based bot checks, not JS rendering — see fetcher/http.ts.
+// Nippon's own download page is genuinely JS-rendered, so it is sourced from
+// AdvisorKhoj instead. SBI/ICICI/Kotak remain disabled: their full portfolios
+// are behind WAF-protected SPAs with nothing on AdvisorKhoj either.
+import { discoverLinks, UA } from "@/lib/fetcher/http";
 import { keepTopFundFile } from "@/lib/fetcher/topfunds";
 
 export interface FetchItem {
@@ -47,30 +48,98 @@ function parseDate(s: string): { y: number; m: number; d: number } | null {
 const filenameOf = (url: string) =>
   decodeURIComponent(url.split("/").pop() || "file");
 
-// ---- Nippon: one consolidated workbook per month, dated history -----------
-async function nipponDiscover(months: number): Promise<FetchItem[]> {
-  const links = await discoverLinks(
-    "https://mf.nipponindiaim.com/investor-service/downloads/factsheet-portfolio-and-other-disclosures",
-    /MONTHLY-PORTFOLIO.*\.xls(x)?$/i,
-  );
-  const dated = links
-    .map((url) => ({ url, dt: parseDate(url) }))
-    .filter((x) => x.dt)
-    .sort((a, b) => key(b.dt!) - key(a.dt!));
-  return dated.slice(0, months).map((x) => ({ url: x.url, filename: filenameOf(x.url) }));
-}
-
 // ---- HDFC: one file per scheme per month, predictable folder pattern ------
 // Current-month links live on the page; prior months are reached by rewriting
 // the /YYYY-MM/ folder + the "DD Month YYYY" date in each filename.
+//
+// hdfcfund.com's WAF rejects datacenter IPs — the listing page returns 200 from
+// a residential connection and 403 from Vercel — so page discovery cannot be
+// relied on in production. The file CDN (files.hdfcfund.com) is not protected
+// and the URLs are fully deterministic, so when the page is unreachable we
+// construct them from the pinned scheme list below.
+//
+// The page is still tried first: it is the only way a newly launched scheme
+// gets picked up. HDFC_SCHEMES is a fallback, and will drift as HDFC adds or
+// renames funds.
+const HDFC_SCHEMES = [
+  "HDFC Balanced Advantage Fund",
+  "HDFC Business Cycle Fund",
+  "HDFC Defence Fund",
+  "HDFC Dividend Yield Fund",
+  "HDFC ELSS Tax saver",
+  "HDFC Flexi Cap Fund",
+  "HDFC Focused Fund",
+  "HDFC Housing Opportunities Fund",
+  "HDFC Hybrid Equity Fund",
+  "HDFC Infrastructure Fund",
+  "HDFC Innovation Fund",
+  "HDFC Large Cap Fund",
+  "HDFC Large and Mid Cap Fund",
+  "HDFC MNC Fund",
+  "HDFC Mid Cap Fund",
+  "HDFC Multi Cap Fund",
+  "HDFC Small Cap Fund",
+  "HDFC Technology Fund",
+  "HDFC Transportation and Logistics Fund",
+  "HDFC Value Fund",
+];
+
+/** Build the canonical HDFC URL for one scheme and one data month. */
+function hdfcUrl(scheme: string, y: number, m: number): string {
+  // Folder is the month AFTER the data month (June data → /2026-07/).
+  const folderDate = new Date(Date.UTC(y, m, 1));
+  const folder = `${folderDate.getUTCFullYear()}-${String(
+    folderDate.getUTCMonth() + 1,
+  ).padStart(2, "0")}`;
+  const dated = `${lastDay(y, m)} ${MONTH_NAMES[m]} ${y}`;
+  const name = `Monthly ${scheme} - ${dated}.xlsx`;
+  return `https://files.hdfcfund.com/s3fs-public/${folder}/${encodeURIComponent(name).replace(/%2F/g, "/")}`;
+}
+
+/**
+ * Newest data month that is plausibly published.
+ *
+ * SEBI gives AMCs ~10 days after month-end, so before roughly the 12th the
+ * previous month is not up yet and requesting it just 403s. Guessing the wrong
+ * month is worse here than in page discovery, where the listing only ever shows
+ * files that exist.
+ */
+export function newestPublishedMonth(now: Date, publishDay = 12): { y: number; m: number } {
+  const back = now.getUTCDate() >= publishDay ? 1 : 2;
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1));
+  return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1 };
+}
+
+/** Construct URLs for the newest `months` data months, newest first. */
+export function hdfcConstructed(months: number, now = new Date()): FetchItem[] {
+  const newest = newestPublishedMonth(now);
+  const items: FetchItem[] = [];
+  for (let back = 0; back < months; back++) {
+    const d = new Date(Date.UTC(newest.y, newest.m - 1 - back, 1));
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth() + 1;
+    for (const scheme of HDFC_SCHEMES) {
+      const url = hdfcUrl(scheme, y, m);
+      items.push({ url, filename: filenameOf(url), fundNameHint: scheme });
+    }
+  }
+  return items;
+}
+
 async function hdfcDiscover(months: number): Promise<FetchItem[]> {
-  const links = await discoverLinks(
-    "https://www.hdfcfund.com/statutory-disclosure/portfolio/monthly-portfolio",
-    /files\.hdfcfund\.com\/.*Monthly.*\.xlsx$/i,
-  );
+  let links: string[] = [];
+  try {
+    links = await discoverLinks(
+      "https://www.hdfcfund.com/statutory-disclosure/portfolio/monthly-portfolio",
+      /files\.hdfcfund\.com\/.*Monthly.*\.xlsx$/i,
+    );
+  } catch {
+    return hdfcConstructed(months);
+  }
+
   // Keep only the curated top HDFC equity funds (by AUM).
   const current = links.filter((u) => keepTopFundFile("HDFC", filenameOf(u)));
-  if (!current.length) return [];
+  if (!current.length) return hdfcConstructed(months);
 
   // Reference month from the first dated filename.
   const ref = current.map((u) => parseDate(filenameOf(u))).find(Boolean);
@@ -84,10 +153,6 @@ async function hdfcDiscover(months: number): Promise<FetchItem[]> {
     }
   }
   return items;
-}
-
-function key(d: { y: number; m: number; d: number }) {
-  return d.y * 10000 + d.m * 100 + d.d;
 }
 
 // Rewrite an HDFC URL back `back` months (folder + filename date). Works on
@@ -150,8 +215,8 @@ async function axisDiscover(months: number): Promise<FetchItem[]> {
 // date them with a fuzzy month extractor and keep the newest `months` distinct
 // months.
 
-/** Extract a sortable YYYYMM key from a messy filename/URL, or 0. */
-function fuzzyMonthKey(s: string): number {
+/** Extract a sortable YYYYMM key from a messy filename/URL, or 0. Exported for tests. */
+export function fuzzyMonthKey(s: string): number {
   const dec = decodeURIComponent(s);
   const ok = (y: number, m: number) =>
     m >= 1 && m <= 12 && y >= 2020 && y <= 2035 ? y * 100 + m : 0;
@@ -250,7 +315,18 @@ async function notImplemented(): Promise<FetchItem[]> {
 }
 
 export const AMC_SOURCES: AmcSource[] = [
-  { amc: "Nippon India Mutual Fund", enabled: true, months: 2, discover: nipponDiscover },
+  {
+    // Nippon's own downloads page renders its links client-side, so it is the
+    // one source that actually needed a browser. AdvisorKhoj mirrors the same
+    // consolidated workbooks as static links, current through the latest month.
+    amc: "Nippon India Mutual Fund",
+    enabled: true,
+    months: 2,
+    discover: advisorKhojDiscover(
+      "Nippon-India-Mutual-Fund",
+      /NIMF-MONTHLY-PORTFOLIO.*\.xlsx?$/i,
+    ),
+  },
   { amc: "HDFC Mutual Fund", enabled: true, months: 2, discover: hdfcDiscover },
   { amc: "Axis Mutual Fund", enabled: true, months: 2, discover: axisDiscover },
   // AdvisorKhoj mirror route — consolidated monthly workbooks, verified live.
@@ -301,9 +377,24 @@ export const AMC_SOURCES: AmcSource[] = [
       /quantmutual\.com\/Admin\/disclouser\/.*\.xlsx$/i,
     ),
   },
-  // Aditya Birla SL & UTI publish on AdvisorKhoj too, but only as ZIP bundles
-  // (zip extraction not supported yet). DSP/Mirae/PPFAS/Canara Robeco/Bandhan
-  // have no files on AdvisorKhoj.
+  {
+    // Aditya Birla SL ships the consolidated workbook inside a ZIP; the sync
+    // path unwraps it (src/lib/archive.ts). Filenames are the least consistent
+    // of any AMC here ("30-june-2026", "31052026", "april-30-2026",
+    // "mar-2026"), which the fuzzy month parser handles. Two CDN hosts serve
+    // the same media path, so the pattern matches on path, not host.
+    amc: "Aditya Birla Sun Life Mutual Fund",
+    enabled: true,
+    months: 2,
+    discover: advisorKhojDiscover(
+      "Aditya-Birla-Sun-Life-Mutual-Fund",
+      /\/monthly-portfolio\/\d{4}\/[^/]+\.zip$/i,
+    ),
+  },
+  // UTI publishes on AdvisorKhoj as ZIPs too, but only two exist and the newest
+  // is Feb 2026 — enabling it would inject a stale, isolated month rather than
+  // extend the timeline. DSP/Mirae/PPFAS/Canara Robeco/Bandhan have no files
+  // on AdvisorKhoj.
   // SBI & ICICI publish only factsheet PDFs publicly (summarized top holdings),
   // not full monthly-portfolio workbooks; their full files sit behind WAF-
   // protected SPAs. Kotak's portfolio page is a JS SPA with no static links.

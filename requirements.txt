@@ -1,0 +1,13 @@
+# Runtime dependencies for the Python Vercel Function in api/parse.py.
+# Deliberately narrower than parser/requirements.txt, which also carries
+# reportlab for generating test fixtures — that never runs in production and
+# only inflates the function bundle.
+pdfplumber==0.11.8
+pymupdf
+pandas
+openpyxl
+# Legacy .xls support: ABSL alternates between .xlsx and .xls
+# month to month, and pandas needs xlrd for the old format. It was only ever
+# present locally as a transitive dependency, so omitting it here failed in
+# production and nowhere else.
+xlrd>=2.0.1

@@ -52,9 +52,21 @@ AMC_PATTERNS = [
 
 
 def detect_amc(text: str, filename: str) -> str:
-    hay = f"{filename}\n{text[:4000]}"
+    # Filename first, as its own pass. Searching filename and body together
+    # lets the body decide: nearly every equity scheme holds "HDFC Bank Ltd",
+    # and because patterns are tried in list order, that lone holding matched
+    # HDFC before the sheet's real AMC was ever reached — so an Axis or Kotak
+    # portfolio came back as HDFC. An AMC names its own files, so when the
+    # filename identifies one it is the trustworthy signal.
+    # Separators must become spaces first: "_" is a word character, so \bKotak\b
+    # does not match "kotak_equity_opportunities", and "nippon_india" does not
+    # match "Nippon India".
+    fname = re.sub(r"[^A-Za-z0-9]+", " ", filename)
     for amc, pat in AMC_PATTERNS:
-        if re.search(pat, hay, re.IGNORECASE):
+        if re.search(pat, fname, re.IGNORECASE):
+            return amc
+    for amc, pat in AMC_PATTERNS:
+        if re.search(pat, text[:4000], re.IGNORECASE):
             return amc
     return "Unknown AMC"
 
@@ -438,51 +450,56 @@ def guess_fund_name(text, filename):
     return re.sub(r"\.(pdf|xlsx?)$", "", base, flags=re.IGNORECASE).strip()
 
 
+def parse_file(path, fund_name_hint=None, amc_hint=None):
+    """Parse one workbook/factsheet into the JSON-shaped dict callers expect.
+
+    Returns either {"amc", "funds": [...]} for a consolidated multi-scheme
+    workbook, or {"amc", "fund_name", "report_month", "holdings"} for a single
+    scheme. Raises on failure; callers decide how to report it.
+
+    `amc_hint` beats text sniffing, which can trip on holdings like "HDFC Bank"
+    inside another AMC's sheet. `fund_name_hint` (e.g. from a clean per-scheme
+    filename) beats scraping the sheet header.
+    """
+    # Consolidated multi-scheme workbook (real AMC monthly portfolio).
+    if is_multi_sheet(path):
+        # Read a little text for AMC detection.
+        import pandas as pd
+
+        first = pd.ExcelFile(path).sheet_names[0]
+        head = pd.read_excel(path, sheet_name=first, header=None, nrows=15, dtype=str).fillna("")
+        text = " ".join(str(x) for x in head.values.flatten())
+        amc = amc_hint or detect_amc(text, path)
+        default_month = parse_month(text, path) or datetime.now().strftime("%Y-%m")
+        funds = extract_xlsx_multi(path, amc, default_month)
+        if not funds:
+            raise RuntimeError("No equity schemes found in workbook.")
+        return {"amc": amc, "funds": funds}
+
+    if path.lower().endswith((".xlsx", ".xls")):
+        text, header_idx, rows = extract_xlsx(path)
+    else:
+        text, header_idx, rows = extract_pdf(path)
+    holdings = rows_to_holdings(header_idx, rows)
+    if not holdings:
+        raise RuntimeError("Table found but no equity holdings parsed.")
+    return {
+        "amc": amc_hint or detect_amc(text, path),
+        "fund_name": fund_name_hint or guess_fund_name(text, path),
+        "report_month": parse_month(text, path) or datetime.now().strftime("%Y-%m"),
+        "holdings": holdings,
+    }
+
+
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({"error": "usage: extract.py <file>"}))
         sys.exit(2)
     path = sys.argv[1]
-    # Optional argv[3]: caller-supplied AMC (the fetcher knows which AMC it is
-    # downloading from) — beats text sniffing, which can trip on holdings like
-    # "HDFC Bank" inside another AMC's sheet.
+    hint = sys.argv[2].strip() if len(sys.argv) > 2 and sys.argv[2].strip() else None
     amc_hint = sys.argv[3].strip() if len(sys.argv) > 3 and sys.argv[3].strip() else None
     try:
-        # Consolidated multi-scheme workbook (real AMC monthly portfolio).
-        if is_multi_sheet(path):
-            default_month = datetime.now().strftime("%Y-%m")
-            # Read a little text for AMC detection.
-            import pandas as pd
-
-            first = pd.ExcelFile(path).sheet_names[0]
-            head = pd.read_excel(path, sheet_name=first, header=None, nrows=15, dtype=str).fillna("")
-            text = " ".join(str(x) for x in head.values.flatten())
-            amc = amc_hint or detect_amc(text, path)
-            default_month = parse_month(text, path) or default_month
-            funds = extract_xlsx_multi(path, amc, default_month)
-            if not funds:
-                raise RuntimeError("No equity schemes found in workbook.")
-            print(json.dumps({"amc": amc, "funds": funds}, ensure_ascii=False))
-            return
-
-        if path.lower().endswith((".xlsx", ".xls")):
-            text, header_idx, rows = extract_xlsx(path)
-        else:
-            text, header_idx, rows = extract_pdf(path)
-        holdings = rows_to_holdings(header_idx, rows)
-        if not holdings:
-            raise RuntimeError("Table found but no equity holdings parsed.")
-        # Optional argv[2]: caller-supplied fund-name hint (e.g. from a clean
-        # per-scheme filename) — more reliable than scraping the sheet header.
-        hint = sys.argv[2].strip() if len(sys.argv) > 2 and sys.argv[2].strip() else None
-        result = {
-            "amc": amc_hint or detect_amc(text, path),
-            "fund_name": hint or guess_fund_name(text, path),
-            "report_month": parse_month(text, path)
-                            or datetime.now().strftime("%Y-%m"),
-            "holdings": holdings,
-        }
-        print(json.dumps(result, ensure_ascii=False))
+        print(json.dumps(parse_file(path, hint, amc_hint), ensure_ascii=False))
     except Exception as e:  # noqa: BLE001 - surface a clean error to the caller
         print(json.dumps({"error": str(e)}))
         sys.exit(1)

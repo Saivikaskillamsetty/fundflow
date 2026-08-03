@@ -115,6 +115,11 @@ export interface Dashboard {
 export async function getDashboard(selected?: string): Promise<Dashboard> {
   const months = await getMonths();
   const month = selected && months.includes(selected) ? selected : months[0] ?? null;
+  // The preceding month that actually has data, not the preceding calendar
+  // month — an ingestion gap would otherwise name a month nothing exists for.
+  // `months` is newest-first, so the next entry is the prior one; null means
+  // this is the earliest month and every position necessarily reads as new.
+  const prevMonth = month ? (months[months.indexOf(month) + 1] ?? null) : null;
   if (!month) {
     return {
       month: null,
@@ -185,7 +190,7 @@ export async function getDashboard(selected?: string): Promise<Dashboard> {
   return {
     month,
     months,
-    prevMonth: null,
+    prevMonth,
     cards: {
       fundsAnalyzed: Number(fundCount),
       stocksFound: aggs.length,

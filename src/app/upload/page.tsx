@@ -24,12 +24,27 @@ export default function UploadPage() {
     }
   }, []);
 
+  // Poll the upload queue while anything is still in flight. The fetch is
+  // inlined rather than reusing `refresh` so the state update is visibly owned
+  // by this effect, and `cancelled` keeps a response that lands after unmount
+  // from setting state on a dead component.
   useEffect(() => {
-    refresh();
-    // Poll while anything is still in flight.
-    const t = setInterval(refresh, 2000);
-    return () => clearInterval(t);
-  }, [refresh]);
+    let cancelled = false;
+
+    const tick = async () => {
+      const res = await fetch("/api/uploads", { cache: "no-store" });
+      if (cancelled || !res.ok) return;
+      const data = await res.json();
+      if (!cancelled) setRows(data.uploads);
+    };
+
+    void tick();
+    const t = setInterval(() => void tick(), 2000);
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, []);
 
   const upload = useCallback(
     async (files: FileList | File[]) => {

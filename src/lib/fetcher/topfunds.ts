@@ -47,6 +47,13 @@ export const TOP_FUNDS: { match: RegExp; test: RegExp }[] = [
     test: /(Mid Cap|Small Cap|Large (&|and) Mid|Flexi[\s-]?Cap|Large Cap|ELSS|Tax Saver|Focused|Multi Cap|Multicap|Recently Listed IPO|Business Cycle)/i,
   },
   {
+    // Aditya Birla SL — flagship equity schemes. Its consolidated workbook
+    // carries 74 schemes, most of them debt/liquid/index, so this allowlist is
+    // doing more filtering work than the others.
+    match: /Aditya Birla|\bABSL\b/i,
+    test: /(Flexi[\s-]?Cap|Large Cap|Large & Mid Cap|Large and Mid|Mid ?cap|Small Cap|Multi[\s-]?Cap|ELSS|Tax Saver|Focused|Value Fund|Dividend Yield|Equity Hybrid|Infrastructure|Digital India|Pharma & Healthcare|Banking and Financial|Consumption|Manufacturing Equity|PSU Equity|Special Opportunities|Conglomerate|Transportation and Logistics|Quant Fund|Retirement Fund)/i,
+  },
+  {
     // Quant — flagship equity schemes
     match: /\bQuant\b/i,
     test: /(Small Cap|Mid Cap|Flexi[\s-]?Cap|Active|ELSS|Tax|Large (&|and) Mid|Value|Infrastructure|Momentum|Large Cap|Multi Cap|Multicap|Focused|Business Cycle)/i,
