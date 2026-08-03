@@ -23,13 +23,20 @@ interface MultiResult {
   funds: Omit<ParsedFund, "amc">[];
 }
 
-/** Absolute URL of the Python parse function, or null to use a subprocess. */
+/**
+ * Absolute URL of the Python parse function, or null to use a subprocess.
+ *
+ * Mirrors selfOrigin(): VERCEL_URL so a preview parses against its own function,
+ * but the production URL in production, because deployment protection 302s the
+ * VERCEL_URL host to an SSO page and the parser would receive HTML.
+ */
 function parserUrl(): string | null {
   const explicit = process.env.PARSER_URL;
   if (explicit) return explicit;
-  // VERCEL_URL is *this* deployment. Using the production URL here would make a
-  // preview parse against production's function instead of its own.
-  const host = process.env.VERCEL_URL;
+  const host =
+    (process.env.VERCEL_ENV === "production"
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : undefined) || process.env.VERCEL_URL;
   return host ? `https://${host}/api/parse` : null;
 }
 

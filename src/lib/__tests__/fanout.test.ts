@@ -12,6 +12,8 @@ import { enabledSources } from "@/lib/fetcher/amcs";
 const ORIGIN = "https://deployment.vercel.app";
 const SECRET = "s3cr3t";
 
+const jsonHeaders = { get: (k: string) => (k === "content-type" ? "application/json" : null) };
+
 const ok = (amc: string, ingested = 10, holdings = 100) => ({
   amc,
   ingested,
@@ -30,7 +32,7 @@ describe("fanoutSync", () => {
       "fetch",
       vi.fn(async (url: string, init: RequestInit) => {
         calls.push([url, init]);
-        return { ok: true, status: 200, json: async () => ok("x") };
+        return { ok: true, status: 200, headers: jsonHeaders, json: async () => ok("x") };
       }),
     );
 
@@ -52,7 +54,7 @@ describe("fanoutSync", () => {
       "fetch",
       vi.fn(async (url: string) => {
         urls.push(url);
-        return { ok: true, status: 200, json: async () => ok("x") };
+        return { ok: true, status: 200, headers: jsonHeaders, json: async () => ok("x") };
       }),
     );
 
@@ -67,6 +69,7 @@ describe("fanoutSync", () => {
       vi.fn(async () => ({
         ok: true,
         status: 200,
+        headers: jsonHeaders,
         json: async () => ok("x", 3, 30),
       })),
     );
@@ -86,9 +89,9 @@ describe("fanoutSync", () => {
       vi.fn(async () => {
         if (first) {
           first = false;
-          return { ok: false, status: 500, json: async () => ({}) };
+          return { ok: false, status: 500, headers: jsonHeaders, json: async () => ({}) };
         }
-        return { ok: true, status: 200, json: async () => ok("x", 2, 20) };
+        return { ok: true, status: 200, headers: jsonHeaders, json: async () => ok("x", 2, 20) };
       }),
     );
 
@@ -119,7 +122,7 @@ describe("fanoutSync", () => {
     // the prior month being complete — so this must run exactly once, at the end.
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => ({ ok: true, status: 200, json: async () => ok("x") })),
+      vi.fn(async () => ({ ok: true, status: 200, headers: jsonHeaders, json: async () => ok("x") })),
     );
 
     await fanoutSync(ORIGIN, SECRET);
@@ -136,5 +139,25 @@ describe("fanoutSync", () => {
 
     await fanoutSync(ORIGIN, SECRET);
     expect(recomputeAllSignals).toHaveBeenCalledTimes(1);
+  });
+
+  it("names deployment protection instead of surfacing a JSON parse error", async () => {
+    // A protected self-call returns 200 with an HTML login page, so .json()
+    // would throw "Unexpected token '<'" and say nothing about the cause.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        headers: { get: () => "text/html; charset=utf-8" },
+        json: async () => {
+          throw new SyntaxError("Unexpected token '<'");
+        },
+      })),
+    );
+
+    const s = await fanoutSync(ORIGIN, SECRET);
+    expect(s.failed).toBe(enabledSources().length);
+    expect(s.results[0].errors[0]).toMatch(/deployment protection/);
   });
 });

@@ -70,18 +70,34 @@ describe("requireInternalAuth", () => {
 describe("selfOrigin", () => {
   afterEach(() => {
     delete process.env.VERCEL_URL;
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
   });
 
-  it("prefers VERCEL_URL — this deployment, not production", () => {
-    // Using the production URL would make a preview exercise production's
-    // functions instead of the code under test.
+  it("uses VERCEL_URL on a preview — its own code, not production's", () => {
+    process.env.VERCEL_ENV = "preview";
     process.env.VERCEL_URL = "fundflow-abc123.vercel.app";
     process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-beta.vercel.app";
     expect(selfOrigin(req())).toBe("https://fundflow-abc123.vercel.app");
   });
 
+  it("uses the custom domain in production, which protection exempts", () => {
+    // Deployment protection is all_except_custom_domains: in production the
+    // VERCEL_URL host 302s to an SSO page, so a self-call there receives HTML
+    // and every AMC fails on a JSON parse.
+    process.env.VERCEL_ENV = "production";
+    process.env.VERCEL_URL = "fundflow-bbyvhqx8g.vercel.app";
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-beta.vercel.app";
+    expect(selfOrigin(req())).toBe("https://fundflow-beta.vercel.app");
+  });
+
+  it("falls back to VERCEL_URL if production has no custom domain", () => {
+    process.env.VERCEL_ENV = "production";
+    process.env.VERCEL_URL = "fundflow-bbyvhqx8g.vercel.app";
+    expect(selfOrigin(req())).toBe("https://fundflow-bbyvhqx8g.vercel.app");
+  });
+
   it("falls back to the request host off-platform", () => {
-    delete process.env.VERCEL_URL;
     expect(selfOrigin(req({ host: "localhost:3000" }))).toBe(
       "https://localhost:3000",
     );

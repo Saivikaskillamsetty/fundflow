@@ -25,13 +25,24 @@ export function requireInternalAuth(request: Request): void {
 /**
  * Origin to call sibling functions on.
  *
- * VERCEL_URL first, deliberately: it is *this* deployment. Preferring
- * VERCEL_PROJECT_PRODUCTION_URL would make every preview call production's
- * functions instead of its own, so a preview would silently exercise the
- * currently-deployed code rather than the code under test.
+ * Two competing constraints, which is why this is not simply VERCEL_URL:
+ *
+ * - A preview must call *itself*, not production, or it would silently exercise
+ *   the deployed code instead of the code under test. So VERCEL_URL there.
+ * - Deployment protection on this project is `all_except_custom_domains`, so in
+ *   production the VERCEL_URL host 302s to an SSO login page while the custom
+ *   domain serves normally. A self-call to VERCEL_URL therefore gets HTML, and
+ *   every AMC fails with a JSON parse error. So the production URL there.
+ *
+ * Both resolve to the same deployment; only the protection differs.
  */
 export function selfOrigin(request: Request): string {
-  const host = process.env.VERCEL_URL || request.headers.get("host");
+  const host =
+    (process.env.VERCEL_ENV === "production"
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : undefined) ||
+    process.env.VERCEL_URL ||
+    request.headers.get("host");
   if (!host) throw new Error("cannot determine deployment origin");
   return host.startsWith("http") ? host : `https://${host}`;
 }
