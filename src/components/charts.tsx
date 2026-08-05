@@ -48,7 +48,9 @@ export function MoversChart({ data }: { data: StockAgg[] }) {
             return [`${v > 0 ? "+" : ""}${v}%`, "Net Δ weight"];
           }}
         />
-        <Bar dataKey="value" radius={[0, 3, 3, 0]}>
+        {/* Animation starts while ResponsiveContainer still measures 0 width,
+            leaving zero-size bars until a resize forces a re-layout. */}
+        <Bar dataKey="value" radius={[0, 3, 3, 0]} isAnimationActive={false}>
           {rows.map((r, i) => (
             <Cell key={i} fill={r.value >= 0 ? UP : DOWN} />
           ))}
@@ -92,7 +94,9 @@ export function SectorChart({
             return [`${v > 0 ? "+" : ""}${v}%`, "Net Δ weight"];
           }}
         />
-        <Bar dataKey="value" radius={[0, 3, 3, 0]}>
+        {/* Animation starts while ResponsiveContainer still measures 0 width,
+            leaving zero-size bars until a resize forces a re-layout. */}
+        <Bar dataKey="value" radius={[0, 3, 3, 0]} isAnimationActive={false}>
           {rows.map((r, i) => (
             <Cell key={i} fill={r.value >= 0 ? UP : DOWN} />
           ))}
