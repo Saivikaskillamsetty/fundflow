@@ -5,6 +5,7 @@
 // month-end to publish, so the 12th reliably has the prior month.
 import { NextResponse } from "next/server";
 import { fanoutSync } from "@/lib/fanout";
+import { sendSyncReport } from "@/lib/report-email";
 import { requireInternalAuth, selfOrigin, Unauthorized } from "@/lib/internal-auth";
 
 export const runtime = "nodejs";
@@ -30,5 +31,8 @@ export async function GET(request: Request) {
   }
 
   const summary = await fanoutSync(selfOrigin(request), process.env.CRON_SECRET!);
-  return NextResponse.json(summary);
+  // Report failures ride along in the response instead of failing the sync —
+  // the data work succeeded regardless of whether the email went out.
+  const email = await sendSyncReport(summary);
+  return NextResponse.json({ ...summary, email });
 }
