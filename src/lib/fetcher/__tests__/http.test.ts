@@ -2,7 +2,7 @@
 // absolute and always an anchor; plain HTML is neither, so these pin the two
 // extraction passes and the URL resolution that Chrome used to do for free.
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { discoverLinks, fetchFile, fetchPage } from "@/lib/fetcher/http";
+import { discoverLinks, fetchFile, fetchPage, isLikelyLive } from "@/lib/fetcher/http";
 
 function mockPage(html: string, ok = true, status = 200) {
   vi.stubGlobal(
@@ -142,5 +142,45 @@ describe("fetchFile", () => {
   it("still reports a non-200 by status", async () => {
     mockBody(Buffer.from("nope"), false, 404);
     await expect(fetchFile(FILE)).rejects.toThrow(/404/);
+  });
+});
+
+// A HEAD-only liveness check silently zeroed Aditya Birla, whose CDN 404s every
+// HEAD while serving the same URL over GET.
+describe("isLikelyLive", () => {
+  function mockProbe(byMethod: (method: string) => number) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init?: { method?: string }) => {
+        const status = byMethod(init?.method ?? "GET");
+        return { ok: status < 400, status };
+      }),
+    );
+  }
+  const URL_ = "https://cdn.example.com/portfolio.zip";
+
+  it("accepts a link HEAD reports as present", async () => {
+    mockProbe(() => 200);
+    await expect(isLikelyLive(URL_)).resolves.toBe(true);
+  });
+
+  it("keeps a link that 404s on HEAD but serves a ranged GET", async () => {
+    mockProbe((m) => (m === "HEAD" ? 404 : 206));
+    await expect(isLikelyLive(URL_)).resolves.toBe(true);
+  });
+
+  it("discards a link only when both agree it is gone", async () => {
+    mockProbe(() => 404);
+    await expect(isLikelyLive(URL_)).resolves.toBe(false);
+  });
+
+  it("assumes live when the probe itself fails", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("network"); }));
+    await expect(isLikelyLive(URL_)).resolves.toBe(true);
+  });
+
+  it("treats a bot check as live rather than gone", async () => {
+    mockProbe(() => 403);
+    await expect(isLikelyLive(URL_)).resolves.toBe(true);
   });
 });

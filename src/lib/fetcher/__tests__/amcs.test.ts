@@ -78,9 +78,10 @@ describe("advisorKhoj discovery skips links that are gone", () => {
           return { ok: true, status: 200, text: async () => html };
         }
         const gone = dead.some((d) => decodeURIComponent(url).includes(d));
-        // Only HEAD probes are issued during discovery.
-        expect(init?.method).toBe("HEAD");
-        return { ok: !gone, status: gone ? 404 : 200 };
+        // Some CDNs 404 every HEAD while serving GET fine, so a gone verdict is
+        // only trusted once a ranged GET agrees.
+        if (init?.method === "HEAD") return { ok: false, status: 404 };
+        return { ok: !gone, status: gone ? 404 : 206 };
       }),
     );
   }

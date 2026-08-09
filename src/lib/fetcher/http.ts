@@ -124,7 +124,19 @@ export function isGone(status: number): boolean {
  */
 export async function isLikelyLive(url: string): Promise<boolean> {
   try {
-    const res = await fetch(url, { method: "HEAD", headers: { "user-agent": UA } });
+    const head = await fetch(url, { method: "HEAD", headers: { "user-agent": UA } });
+    if (!isGone(head.status)) return true;
+  } catch {
+    return true;
+  }
+  // HEAD reported it gone — but that alone is not trustworthy. Aditya Birla's
+  // CDN answers 404 to every HEAD while serving the same URL happily over GET,
+  // so a HEAD-only check silently zeroed the AMC. Confirm with a one-byte
+  // ranged GET before discarding a whole month.
+  try {
+    const res = await fetch(url, {
+      headers: { "user-agent": UA, range: "bytes=0-0" },
+    });
     return !isGone(res.status);
   } catch {
     return true;

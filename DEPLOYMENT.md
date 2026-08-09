@@ -191,19 +191,30 @@ download the sync already tolerates.
 
 Consequence: Motilal trails the others by design until it fixes its own links.
 
-## Known limitation: Edelweiss blocks intermittently
+## Known limitation: Edelweiss rejects datacenter IPs
 
-`edelweissmf.com` sometimes answers a file request with an "Access Denied" HTML
-page — **at HTTP 200**, and occasionally as a several-hundred-KB homepage, so
-`res.ok` and the payload size both look fine. Stored as-is it surfaced much
-later as an opaque parser failure.
+Like HDFC, `edelweissmf.com` serves files to residential connections and blocks
+Vercel. Discovery succeeds (the links come from AdvisorKhoj) but every download
+fails in production, while the same URLs return real workbooks from a laptop.
+Retries do not help — the block is by origin, not load.
 
-Two guards, both in `fetchFile`:
+The failure is deceptive: the CDN answers with an "Access Denied" page **at
+HTTP 200**, once as a 794KB homepage, so neither the status nor the payload
+size gives it away. Stored as-is it surfaced much later as an opaque parser
+error on a file that looked fine.
+
+Two guards in `fetchFile`, worth keeping regardless of the block:
 
 - Payload sniffing (`looksLikeHtml`) rejects markup where a document is
   expected, naming the real cause at the point of failure.
-- Retry with backoff, since the same URL serves a real workbook moments later.
-  A 404/410 is never retried — a missing file stays missing.
+- Retry with backoff for genuinely transient refusals. A 404/410 is never
+  retried — a missing file stays missing.
+
+Unlike HDFC there is no unprotected CDN to fall back to and no mirror on
+AdvisorKhoj (all 42 links point at `edelweissmf.com`), so Edelweiss cannot be
+refreshed from production. Its existing history through 2026-06 is intact.
+Running `npm run sync:monthly` from a residential connection is the only way to
+extend it.
 
 ## Known limitation: HDFC
 
