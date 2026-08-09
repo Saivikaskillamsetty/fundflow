@@ -184,3 +184,52 @@ describe("isLikelyLive", () => {
     await expect(isLikelyLive(URL_)).resolves.toBe(true);
   });
 });
+
+// An unbounded probe took the production cron down: several AMC CDNs accept a
+// connection from Vercel and never answer, and the function burned its whole
+// duration budget waiting on an advisory check.
+describe("probe bounding", () => {
+  it("passes an abort signal on every probe request", async () => {
+    const calls: (RequestInit | undefined)[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_u: string, init?: RequestInit) => {
+        calls.push(init);
+        return { ok: false, status: 404, body: null };
+      }),
+    );
+    await isLikelyLive("https://cdn.example.com/x.zip");
+    expect(calls).toHaveLength(2); // HEAD, then the confirming ranged GET
+    for (const c of calls) expect(c?.signal).toBeDefined();
+  });
+
+  it("assumes live when a probe aborts rather than hanging", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw Object.assign(new Error("The operation was aborted"), {
+          name: "TimeoutError",
+        });
+      }),
+    );
+    await expect(isLikelyLive("https://cdn.example.com/x.zip")).resolves.toBe(true);
+  });
+
+  it("bounds downloads too", async () => {
+    let init: RequestInit | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_u: string, i?: RequestInit) => {
+        init = i;
+        const b = Buffer.from([0x50, 0x4b, 0x03, 0x04]);
+        return {
+          ok: true,
+          status: 200,
+          arrayBuffer: async () => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength),
+        };
+      }),
+    );
+    await fetchFile("https://cdn.example.com/x.xlsx");
+    expect(init?.signal).toBeDefined();
+  });
+});

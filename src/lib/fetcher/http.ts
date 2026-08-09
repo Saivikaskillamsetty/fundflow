@@ -86,7 +86,12 @@ export async function fetchFile(
   let last = "";
   for (let i = 0; i < attempts; i += 1) {
     if (i) await new Promise((r) => setTimeout(r, delayMs * i));
-    const res = await fetch(url, { headers: { "user-agent": UA } });
+    // Generous, but bounded: a host that accepts the connection and then stalls
+    // would otherwise hold the function open until its duration ceiling.
+    const res = await fetch(url, {
+      headers: { "user-agent": UA },
+      signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
+    });
 
     // A missing file will still be missing on the next try.
     if (isGone(res.status)) {
@@ -123,25 +128,46 @@ export function isGone(status: number): boolean {
  * costs a single failed download that the sync already tolerates.
  */
 export async function isLikelyLive(url: string): Promise<boolean> {
-  try {
-    const head = await fetch(url, { method: "HEAD", headers: { "user-agent": UA } });
-    if (!isGone(head.status)) return true;
-  } catch {
-    return true;
-  }
+  const head = await probe(url, { method: "HEAD" });
+  if (head === null || !isGone(head)) return true;
   // HEAD reported it gone — but that alone is not trustworthy. Aditya Birla's
   // CDN answers 404 to every HEAD while serving the same URL happily over GET,
   // so a HEAD-only check silently zeroed the AMC. Confirm with a one-byte
   // ranged GET before discarding a whole month.
+  const ranged = await probe(url, { range: "bytes=0-0" });
+  return ranged === null || !isGone(ranged);
+}
+
+/**
+ * A probe is advisory, so it must never outlast its usefulness: several AMC
+ * CDNs accept a connection from Vercel and then never answer, and an unbounded
+ * fetch inside a function burns the whole duration budget on a check whose
+ * answer we are willing to guess. Returns null when there is no usable answer,
+ * which every caller treats as "assume live".
+ */
+async function probe(
+  url: string,
+  opts: { method?: string; range?: string },
+): Promise<number | null> {
   try {
     const res = await fetch(url, {
-      headers: { "user-agent": UA, range: "bytes=0-0" },
+      method: opts.method ?? "GET",
+      headers: {
+        "user-agent": UA,
+        ...(opts.range ? { range: opts.range } : {}),
+      },
+      signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
     });
-    return !isGone(res.status);
+    // Release the body so a ranged GET does not leave a socket open.
+    await res.body?.cancel().catch(() => {});
+    return res.status;
   } catch {
-    return true;
+    return null;
   }
 }
+
+const PROBE_TIMEOUT_MS = Number(process.env.PROBE_TIMEOUT_MS ?? "6000");
+const DOWNLOAD_TIMEOUT_MS = Number(process.env.DOWNLOAD_TIMEOUT_MS ?? "60000");
 
 /** True when the payload opens with markup rather than a document signature. */
 export function looksLikeHtml(buf: Buffer): boolean {
