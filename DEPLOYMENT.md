@@ -173,6 +173,38 @@ page instead of JSON.
 | Cron frequency | once per day |
 | Python bundle | 500 MB |
 
+## Known limitation: Motilal Oswal publishes dead links
+
+AdvisorKhoj lists Motilal's two newest months pointing at URLs that 404 on
+`motilaloswalmf.com`, while older months resolve normally. Nothing downstream
+can fix that — the files are not served.
+
+Discovery HEAD-probes candidates and skips those that are definitively gone
+(`isLikelyLive` in [http.ts](src/lib/fetcher/http.ts)), walking back up to
+`STALE_MONTH_ALLOWANCE` extra months. Without it the dead newest links consume
+the whole month budget and the AMC yields nothing.
+
+The probe is deliberately asymmetric: **only 404/410 disqualifies a link.** A
+403, a timeout, or a host refusing HEAD all count as live, because dropping a
+good link costs a month of holdings while keeping a bad one costs one failed
+download the sync already tolerates.
+
+Consequence: Motilal trails the others by design until it fixes its own links.
+
+## Known limitation: Edelweiss blocks intermittently
+
+`edelweissmf.com` sometimes answers a file request with an "Access Denied" HTML
+page — **at HTTP 200**, and occasionally as a several-hundred-KB homepage, so
+`res.ok` and the payload size both look fine. Stored as-is it surfaced much
+later as an opaque parser failure.
+
+Two guards, both in `fetchFile`:
+
+- Payload sniffing (`looksLikeHtml`) rejects markup where a document is
+  expected, naming the real cause at the point of failure.
+- Retry with backoff, since the same URL serves a real workbook moments later.
+  A 404/410 is never retried — a missing file stays missing.
+
 ## Known limitation: HDFC
 
 `hdfcfund.com`'s WAF rejects datacenter IPs — its listing page returns 200 from

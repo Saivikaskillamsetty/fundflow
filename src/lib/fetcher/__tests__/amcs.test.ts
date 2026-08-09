@@ -2,8 +2,8 @@
 // is dropped silently, and when it returns the wrong month the holdings land
 // under the wrong reporting period — so these cases are drawn from real
 // filenames observed across the enabled AMCs.
-import { describe, expect, it } from "vitest";
-import { fuzzyMonthKey } from "@/lib/fetcher/amcs";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { AMC_SOURCES, fuzzyMonthKey } from "@/lib/fetcher/amcs";
 
 describe("fuzzyMonthKey", () => {
   it.each([
@@ -22,8 +22,22 @@ describe("fuzzyMonthKey", () => {
     ["scheme-portfolio-May26.xlsx", 202605],
     ["disclosure_Nov_2025.xlsx", 202511],
     ["portfolio-sept-2025.xlsx", 202509],
+    // Axis: all-numeric with a two-digit year, separator varying by host.
+    ["Monthly_Portfolio_31_05_26.xlsx", 202605],
+    ["Monthly Portfolio-30 04 26.xlsx", 202604],
+    ["Monthly Portfolio-28 02 26.xlsx", 202602],
+    // Motilal: a re-upload counter glued onto the year.
+    ["Scheme Portfolio Details June 20261.xlsx", 202606],
   ])("dates %s as %i", (filename, expected) => {
     expect(fuzzyMonthKey(filename)).toBe(expected);
+  });
+
+  it("does not read a month out of a long digit run", () => {
+    // Edelweiss appends a DDMMYYYYHHMMSS publish stamp; the real date is the
+    // one spelled out, not any two digits inside the stamp.
+    expect(
+      fuzzyMonthKey("EDEL_Portfolio_Monthly_Notes_30Jun2026_10072026123257.xlsx"),
+    ).toBe(202606);
   });
 
   it("URL-decodes before matching", () => {
@@ -38,5 +52,64 @@ describe("fuzzyMonthKey", () => {
   it("rejects out-of-range years and months", () => {
     expect(fuzzyMonthKey("portfolio-31-13-2026.xlsx")).toBe(0);
     expect(fuzzyMonthKey("portfolio-31-05-1999.xlsx")).toBe(0);
+  });
+});
+
+// A dead link must not consume the month budget. AdvisorKhoj lists Motilal's
+// two newest months as 404s while older months resolve, so a naive "newest N"
+// returns nothing ingestible at all.
+describe("advisorKhoj discovery skips links that are gone", () => {
+  const LISTING = /advisorkhoj\.com/;
+  const HOST = "https://www.motilaloswalmf.com/x";
+
+  function mockSite(dead: string[]) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: { method?: string }) => {
+        if (LISTING.test(url)) {
+          const html = [
+            `${HOST}/Scheme Portfolio Details June 2026.xlsx`,
+            `${HOST}/PortfolioHolding_May 31, 2026.xlsx`,
+            `${HOST}/Motilal Portfolio 30 April 2026 - Final.xlsx`,
+            `${HOST}/month-end-portfolio-march-2026.xlsx`,
+          ]
+            .map((h) => `<a href="${h}">f</a>`)
+            .join("");
+          return { ok: true, status: 200, text: async () => html };
+        }
+        const gone = dead.some((d) => decodeURIComponent(url).includes(d));
+        // Only HEAD probes are issued during discovery.
+        expect(init?.method).toBe("HEAD");
+        return { ok: !gone, status: gone ? 404 : 200 };
+      }),
+    );
+  }
+
+  const motilal = () =>
+    AMC_SOURCES.find((s) => s.amc === "Motilal Oswal Mutual Fund")!;
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("walks back past dead months to reach live ones", async () => {
+    mockSite(["June 2026", "May 31, 2026"]);
+    const items = await motilal().discover(2);
+    expect(items.map((i) => i.filename)).toEqual([
+      "Motilal Portfolio 30 April 2026 - Final.xlsx",
+      "month-end-portfolio-march-2026.xlsx",
+    ]);
+  });
+
+  it("returns the newest months untouched when nothing is dead", async () => {
+    mockSite([]);
+    const items = await motilal().discover(2);
+    expect(items.map((i) => i.filename)).toEqual([
+      "Scheme Portfolio Details June 2026.xlsx",
+      "PortfolioHolding_May 31, 2026.xlsx",
+    ]);
+  });
+
+  it("yields nothing rather than reaching for stale years", async () => {
+    mockSite(["June 2026", "May 31, 2026", "April 2026", "march-2026"]);
+    expect(await motilal().discover(2)).toEqual([]);
   });
 });

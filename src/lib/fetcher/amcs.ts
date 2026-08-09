@@ -6,7 +6,7 @@
 // Nippon's own download page is genuinely JS-rendered, so it is sourced from
 // AdvisorKhoj instead. SBI/ICICI/Kotak remain disabled: their full portfolios
 // are behind WAF-protected SPAs with nothing on AdvisorKhoj either.
-import { discoverLinks, UA } from "@/lib/fetcher/http";
+import { discoverLinks, isLikelyLive, UA } from "@/lib/fetcher/http";
 import { keepTopFundFile } from "@/lib/fetcher/topfunds";
 
 export interface FetchItem {
@@ -190,24 +190,6 @@ function hdfcName(filename: string): string {
 }
 
 // ---- Axis: consolidated monthly workbook, discovered via AdvisorKhoj -------
-// Axis's own site is a bot-protected SPA, but AdvisorKhoj links straight to the
-// AMC's "Monthly Portfolio-DD MM YY.xlsx" files (dated history).
-async function axisDiscover(months: number): Promise<FetchItem[]> {
-  const links = await discoverLinks(
-    "https://www.advisorkhoj.com/form-download-centre/Mutual/Axis-Mutual-Fund/Monthly-Portfolio-Disclosures",
-    /Monthly[%20 ]*Portfolio.*\.xlsx$/i,
-  );
-  const dated = links
-    .map((url) => {
-      const m = decodeURIComponent(url).match(/(\d{2})\s+(\d{2})\s+(\d{2})/);
-      const k = m ? 200000 + Number(m[3]) * 10000 + Number(m[2]) * 100 + Number(m[1]) : 0;
-      return { url, k };
-    })
-    .filter((x) => x.k)
-    .sort((a, b) => b.k - a.k);
-  return dated.slice(0, months).map((x) => ({ url: x.url, filename: filenameOf(x.url) }));
-}
-
 // ---- Generic AdvisorKhoj route ---------------------------------------------
 // AdvisorKhoj's download centre mirrors monthly-portfolio links for many AMCs
 // with no bot protection (proven with Axis). Filenames are wildly inconsistent
@@ -252,8 +234,31 @@ export function fuzzyMonthKey(s: string): number {
     const k = ok(yr(m[2]), MONTHS[m[1].toLowerCase()]);
     if (k) return k;
   }
+  // "31_05_26", "30 04 26" — all-numeric with a two-digit year. Axis alternates
+  // between underscores and spaces, and between its two CDN hosts, so neither
+  // the dotted nor the DDMMYYYY form above catches these. Last because a bare
+  // numeric triple is the most ambiguous shape here.
+  m = dec.match(/(?<!\d)(\d{1,2})[-_. ](\d{1,2})[-_. ](\d{2})(?!\d)/);
+  if (m && Number(m[1]) >= 1 && Number(m[1]) <= 31) {
+    const k = ok(2000 + Number(m[3]), Number(m[2]));
+    if (k) return k;
+  }
+  // "June 20261" — AMCs re-uploading a file glue a counter onto the year rather
+  // than the stem, so the year no longer ends the digit run.
+  m = dec.match(/([A-Za-z]{3,9})[-_ .]*(\d{4})\d(?!\d)/);
+  if (m && MONTHS[m[1].toLowerCase()]) {
+    const k = ok(Number(m[2]), MONTHS[m[1].toLowerCase()]);
+    if (k) return k;
+  }
   return 0;
 }
+
+/**
+ * How far below the requested window discovery may reach when the newest links
+ * are dead. Covers a couple of stale months without dredging up the years-old
+ * strays that sit under some listings' gaps.
+ */
+const STALE_MONTH_ALLOWANCE = 3;
 
 /** Shift a YYYYMM key back by n months. */
 function keyMonthsBack(k: number, n: number): number {
@@ -291,20 +296,25 @@ function advisorKhojDiscover(
       .filter((x) => x.k > 0)
       .sort((a, b) => b.k - a.k);
     if (!dated.length) return [];
-    // Ignore anything older than the requested window behind the newest file —
-    // some AMC listings have month gaps and then years-old strays (Motilal),
-    // which would otherwise pollute the timeline with sparse ancient months.
-    const cutoff = keyMonthsBack(dated[0].k, months - 1);
     // One file per month (AMCs post corrections like "(1).xlsx" — page order
     // lists the newest first, so first seen per month wins).
+    //
+    // Dead links must not consume the month budget. AdvisorKhoj's Motilal rows
+    // point at 404s for the two newest months while older ones resolve fine, so
+    // a naive "newest N" yields nothing at all. Candidates are probed and
+    // skipped when definitively gone, walking back until N live months are
+    // found. The scan is bounded so a wholly broken listing cannot turn into an
+    // unbounded crawl, and the window still ignores the years-old strays that
+    // sit below a listing's gaps.
+    const cutoff = keyMonthsBack(dated[0].k, months - 1 + STALE_MONTH_ALLOWANCE);
     const seen = new Set<number>();
     const out: FetchItem[] = [];
     for (const x of dated) {
-      if (x.k < cutoff) break;
+      if (x.k < cutoff || out.length >= months) break;
       if (seen.has(x.k)) continue;
       seen.add(x.k);
+      if (!(await isLikelyLive(x.url))) continue;
       out.push({ url: x.url, filename: filenameOf(x.url) });
-      if (out.length >= months) break;
     }
     return out;
   };
@@ -328,7 +338,21 @@ export const AMC_SOURCES: AmcSource[] = [
     ),
   },
   { amc: "HDFC Mutual Fund", enabled: true, months: 2, discover: hdfcDiscover },
-  { amc: "Axis Mutual Fund", enabled: true, months: 2, discover: axisDiscover },
+  {
+    // Axis serves the same series from two hosts (www. and transact.) and flips
+    // its naming between "Monthly Portfolio-30 04 26.xlsx" and
+    // "Monthly_Portfolio_31_05_26.xlsx", so match the filename shape rather
+    // than a host or a fixed separator. "Adhoc Portfolios" are one-off
+    // disclosures outside the monthly series and would otherwise look newest.
+    amc: "Axis Mutual Fund",
+    enabled: true,
+    months: 2,
+    discover: advisorKhojDiscover(
+      "Axis-Mutual-Fund",
+      /axismf\.com\/.*Monthly[%20_ ]*Portfolio.*\.xlsx?$/i,
+      /Adhoc/i,
+    ),
+  },
   // AdvisorKhoj mirror route — consolidated monthly workbooks, verified live.
   {
     amc: "Tata Mutual Fund",

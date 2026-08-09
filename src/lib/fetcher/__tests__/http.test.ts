@@ -2,7 +2,7 @@
 // absolute and always an anchor; plain HTML is neither, so these pin the two
 // extraction passes and the URL resolution that Chrome used to do for free.
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { discoverLinks, fetchPage } from "@/lib/fetcher/http";
+import { discoverLinks, fetchFile, fetchPage } from "@/lib/fetcher/http";
 
 function mockPage(html: string, ok = true, status = 200) {
   vi.stubGlobal(
@@ -102,5 +102,45 @@ describe("fetchPage", () => {
     expect(headers["user-agent"]).toMatch(/Chrome\//);
     expect(headers["sec-fetch-mode"]).toBe("navigate");
     expect(headers["accept-language"]).toBeDefined();
+  });
+});
+
+// A blocked download is the failure mode most likely to be mistaken for a
+// parser bug: the CDN answers 200 with an HTML page, so only the bytes reveal
+// it. Edelweiss shipped a 794KB homepage this way.
+describe("fetchFile", () => {
+  function mockBody(bytes: Buffer, ok = true, status = 200) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok,
+        status,
+        arrayBuffer: async () =>
+          bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+      })),
+    );
+  }
+
+  const FILE = "https://amc.example.com/portfolio.xlsx";
+
+  it("returns the bytes of a real workbook", async () => {
+    const xlsx = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x00, 0x01]); // PK zip
+    mockBody(xlsx);
+    await expect(fetchFile(FILE)).resolves.toEqual(xlsx);
+  });
+
+  it("rejects an HTML page served with a 200", async () => {
+    mockBody(Buffer.from("<!DOCTYPE html><html><body>Access Denied</body></html>"));
+    await expect(fetchFile(FILE)).rejects.toThrow(/HTML page/i);
+  });
+
+  it("sees through leading whitespace and a BOM", async () => {
+    mockBody(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from("\n  <html>hi</html>")]));
+    await expect(fetchFile(FILE)).rejects.toThrow(/HTML page/i);
+  });
+
+  it("still reports a non-200 by status", async () => {
+    mockBody(Buffer.from("nope"), false, 404);
+    await expect(fetchFile(FILE)).rejects.toThrow(/404/);
   });
 });

@@ -70,9 +70,74 @@ export async function discoverLinks(
   return [...found].filter((h) => pattern.test(h));
 }
 
-/** Download a file URL into memory. */
-export async function fetchFile(url: string): Promise<Buffer> {
-  const res = await fetch(url, { headers: { "user-agent": UA } });
-  if (!res.ok) throw new Error(`download failed ${res.status} for ${url}`);
-  return Buffer.from(await res.arrayBuffer());
+/**
+ * Download a file URL into memory.
+ *
+ * A 200 is not enough on its own: AMC CDNs answer blocked requests with an
+ * HTML page — sometimes a redirect to their homepage, so `res.ok` is true and
+ * the body is a plausible size. Stored as-is, that surfaces much later as an
+ * opaque parser failure on a file that looks fine. Reject it here, where the
+ * cause is still visible.
+ */
+export async function fetchFile(
+  url: string,
+  { attempts = 3, delayMs = 400 }: { attempts?: number; delayMs?: number } = {},
+): Promise<Buffer> {
+  let last = "";
+  for (let i = 0; i < attempts; i += 1) {
+    if (i) await new Promise((r) => setTimeout(r, delayMs * i));
+    const res = await fetch(url, { headers: { "user-agent": UA } });
+
+    // A missing file will still be missing on the next try.
+    if (isGone(res.status)) {
+      throw new Error(`download failed ${res.status} for ${url}`);
+    }
+    if (!res.ok) {
+      last = `download failed ${res.status} for ${url}`;
+      continue;
+    }
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (!looksLikeHtml(buf)) return buf;
+
+    // Edelweiss's CDN blocks intermittently: the same URL serves a real
+    // workbook moments after answering with an "Access Denied" page, so this
+    // is worth retrying rather than failing the month.
+    last =
+      `expected a document but got an HTML page (${buf.length} bytes) — ` +
+      `the host is serving a bot check or error page for ${url}`;
+  }
+  throw new Error(last);
+}
+
+/** Definitively absent, as opposed to refused or temporarily unavailable. */
+export function isGone(status: number): boolean {
+  return status === 404 || status === 410;
+}
+
+/**
+ * Whether a discovered link is worth handing to the downloader.
+ *
+ * Deliberately asymmetric: only a definitive 404/410 disqualifies a candidate.
+ * A bot check, a hiccup, or a host that refuses HEAD all count as live, because
+ * dropping a good link costs a whole month of holdings while keeping a bad one
+ * costs a single failed download that the sync already tolerates.
+ */
+export async function isLikelyLive(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: "HEAD", headers: { "user-agent": UA } });
+    return !isGone(res.status);
+  } catch {
+    return true;
+  }
+}
+
+/** True when the payload opens with markup rather than a document signature. */
+export function looksLikeHtml(buf: Buffer): boolean {
+  // Skip a UTF-8 BOM and leading whitespace before sniffing.
+  let i = buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf ? 3 : 0;
+  while (i < buf.length && (buf[i] === 0x20 || buf[i] === 0x09 || buf[i] === 0x0a || buf[i] === 0x0d)) {
+    i += 1;
+  }
+  const head = buf.subarray(i, i + 14).toString("latin1").toLowerCase();
+  return head.startsWith("<!doctype") || head.startsWith("<html") || head.startsWith("<?xml");
 }
