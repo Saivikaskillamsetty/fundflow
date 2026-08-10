@@ -88,12 +88,13 @@ async function runViaSubprocess(
   storedPath: string,
   fundNameHint?: string,
   amcHint?: string,
+  filename?: string,
 ): Promise<unknown> {
   const python = process.env.PYTHON_BIN || "python3";
   const script = path.join(process.cwd(), "parser", "extract.py");
 
   // extract.py opens a real file, so blob-backed refs need a local temp copy.
-  const file = await materialize(storedPath);
+  const file = await materialize(storedPath, filename);
   let stdout: string;
   try {
     const args = [script, file.path];
@@ -127,7 +128,7 @@ export async function runParser(
 
   const parsed = url
     ? await runViaHttp(url, storedPath, name, fundNameHint, amcHint)
-    : await runViaSubprocess(storedPath, fundNameHint, amcHint);
+    : await runViaSubprocess(storedPath, fundNameHint, amcHint, name);
 
   if (parsed && typeof parsed === "object" && "error" in parsed) {
     throw new Error(String((parsed as { error: string }).error));

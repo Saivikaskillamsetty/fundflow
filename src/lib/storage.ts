@@ -41,6 +41,17 @@ export async function putFile(filename: string, body: Buffer): Promise<string> {
   return dest;
 }
 
+/** Basename of a URL path, percent-decoded, with a usable fallback. */
+function decodeName(pathname: string): string {
+  const base = path.basename(pathname);
+  try {
+    return decodeURIComponent(base) || "workbook";
+  } catch {
+    // Malformed escapes — the raw name is still better than nothing.
+    return base || "workbook";
+  }
+}
+
 export interface Materialized {
   /** Local filesystem path the Python parser can open. */
   path: string;
@@ -52,7 +63,10 @@ export interface Materialized {
  * Give the parser a real file on local disk. Local refs are used in place;
  * remote refs are fetched to a temp file the caller must clean up.
  */
-export async function materialize(storedPath: string): Promise<Materialized> {
+export async function materialize(
+  storedPath: string,
+  preferredName?: string,
+): Promise<Materialized> {
   if (!isRemote(storedPath)) {
     return { path: storedPath, cleanup: async () => {} };
   }
@@ -60,7 +74,12 @@ export async function materialize(storedPath: string): Promise<Materialized> {
   if (!res.ok) {
     throw new Error(`could not fetch stored file ${storedPath}: ${res.status}`);
   }
-  const name = path.basename(new URL(storedPath).pathname) || "workbook";
+  // The temp file's name is load-bearing: the parser reads the reporting month
+  // out of it when the workbook itself does not say, and silently falls back to
+  // the current month when that fails. A URL pathname is percent-encoded, so
+  // "30th June 2026" arrives as "30th%20June%202026", no month is found, and
+  // holdings land under whatever month the sync happened to run in.
+  const name = preferredName || decodeName(new URL(storedPath).pathname);
   const tmp = path.join(os.tmpdir(), `${randomUUID()}-${name}`);
   await writeFile(tmp, Buffer.from(await res.arrayBuffer()));
   return {
