@@ -56,8 +56,14 @@ export async function deleteFile(storedPath: string): Promise<void> {
   try {
     const { del } = await import("@vercel/blob");
     await del(storedPath);
-  } catch {
-    // Orphaned blob; not worth failing or retrying a completed ingest over.
+  } catch (err) {
+    // Orphaned blob. Not worth failing a completed ingest over, but silence
+    // here is how a slow leak hides: a run that deletes 48 of 53 looks exactly
+    // like one that deletes all 53.
+    console.warn(
+      `[storage] could not delete ${storedPath}: ` +
+        (err instanceof Error ? err.message : String(err)),
+    );
   }
 }
 
