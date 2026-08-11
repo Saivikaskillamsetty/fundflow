@@ -15,6 +15,11 @@ const OLLAMA_URL = process.env.OLLAMA_URL ?? "http://localhost:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "gemma4";
 const GROQ_MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
 
+/** Running on Vercel rather than a developer's machine. */
+function isDeployed(): boolean {
+  return Boolean(process.env.VERCEL);
+}
+
 async function complete(prompt: string): Promise<string> {
   if (PROVIDER === "groq") {
     const key = process.env.GROQ_API_KEY;
@@ -62,6 +67,21 @@ async function complete(prompt: string): Promise<string> {
   }
 
   // Default: free local Ollama (no API key required).
+  //
+  // That default only makes sense on a developer's machine. Deployed, it points
+  // at a localhost that cannot exist inside a function, and the bare fetch
+  // rejection surfaces in the UI as "fetch failed" — which says nothing about
+  // the actual problem being an unset environment variable.
+  if (isDeployed() && !process.env.LLM_PROVIDER) {
+    throw new Error(
+      "No AI provider is configured for this deployment. LLM_PROVIDER is unset, " +
+        "so it falls back to a local Ollama that does not exist here. Set " +
+        "LLM_PROVIDER=groq with GROQ_API_KEY (free key at " +
+        "https://console.groq.com/keys), or LLM_PROVIDER=anthropic with " +
+        "ANTHROPIC_API_KEY.",
+    );
+  }
+
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -71,6 +91,13 @@ async function complete(prompt: string): Promise<string> {
       options: { temperature: 0.3 },
       messages: [{ role: "user", content: prompt }],
     }),
+  }).catch(() => {
+    // A refused connection is the common case here, and its message ("fetch
+    // failed") names neither the host nor the reason.
+    throw new Error(
+      `Cannot reach Ollama at ${OLLAMA_URL}. Is \`ollama serve\` running with ` +
+        `model "${OLLAMA_MODEL}"? Otherwise set LLM_PROVIDER=groq or anthropic.`,
+    );
   });
   if (!res.ok) {
     throw new Error(
