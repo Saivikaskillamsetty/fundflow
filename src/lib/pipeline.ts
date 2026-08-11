@@ -9,6 +9,7 @@ import { uploads } from "@/db/schema";
 import { runParser } from "@/lib/parser";
 import { ingestFund } from "@/lib/ingest";
 import { isTopFund } from "@/lib/fetcher/topfunds";
+import { deleteFile } from "@/lib/storage";
 
 export interface ProcessResult {
   funds: number;
@@ -32,6 +33,13 @@ export async function processUpload(opts: {
    * across every fund.
    */
   recomputeSignals?: boolean;
+  /**
+   * Keep the stored copy after a successful ingest. A synced file is always
+   * re-downloadable from the AMC, so the sync discards it and the blob store
+   * stays flat. A hand-uploaded file may be the only copy, so the upload route
+   * keeps it.
+   */
+  retainSource?: boolean;
 }): Promise<ProcessResult> {
   const {
     uploadId,
@@ -40,6 +48,7 @@ export async function processUpload(opts: {
     fundNameHint,
     amcHint,
     recomputeSignals = true,
+    retainSource = true,
   } = opts;
 
   await db.update(uploads).set({ status: "parsing" }).where(eq(uploads.id, uploadId));
@@ -68,6 +77,10 @@ export async function processUpload(opts: {
         errorMsg: null,
       })
       .where(eq(uploads.id, uploadId));
+
+    // The row keeps the reference as a record of where the data came from; the
+    // bytes themselves are no longer needed.
+    if (!retainSource) await deleteFile(storedPath);
 
     return { funds: funds.length, holdings: totalHoldings };
   } catch (err) {

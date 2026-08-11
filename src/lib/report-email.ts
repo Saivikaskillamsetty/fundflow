@@ -19,6 +19,7 @@ export function composeReport(
   summary: FanoutSummary,
   newestByAmc: { amc: string; newest: string | null; funds: number }[],
   signalMix: { month: string; signal: string; count: number }[],
+  advanced: string[] = [],
 ): { subject: string; text: string } {
   const newest =
     newestByAmc.reduce<string | null>(
@@ -33,6 +34,13 @@ export function composeReport(
     `This run: ${summary.ingested} funds ingested, ${summary.holdings} holdings, ` +
       `${summary.failed} failed across ${summary.amcs} AMCs.`,
   );
+  lines.push("");
+  if (advanced.length) {
+    lines.push("New data this run:");
+    for (const a of advanced) lines.push(`- ${a}`);
+  } else {
+    lines.push("No AMC advanced to a newer month this run.");
+  }
   lines.push("");
   lines.push("Newest month per AMC:");
   for (const r of newestByAmc) {
@@ -63,6 +71,21 @@ export function composeReport(
   };
 }
 
+/**
+ * Newest ingested month per AMC, keyed by AMC name. Used to tell whether a run
+ * actually advanced anything, which decides whether it is worth an email.
+ */
+export async function newestMonthByAmc(): Promise<Record<string, string>> {
+  const rows = await db
+    .select({ amc: funds.amc, newest: max(holdings.reportMonth) })
+    .from(funds)
+    .innerJoin(holdings, eq(holdings.fundId, funds.id))
+    .groupBy(funds.amc);
+  return Object.fromEntries(
+    rows.filter((r) => r.newest).map((r) => [r.amc, r.newest as string]),
+  );
+}
+
 async function gatherContext() {
   const newestByAmc = await db
     .select({
@@ -89,6 +112,7 @@ async function gatherContext() {
  */
 export async function sendSyncReport(
   summary: FanoutSummary,
+  advanced: string[] = [],
 ): Promise<{ sent: boolean; reason?: string }> {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.REPORT_EMAIL_TO;
@@ -97,7 +121,7 @@ export async function sendSyncReport(
 
   try {
     const { newestByAmc, signalMix } = await gatherContext();
-    const { subject, text } = composeReport(summary, newestByAmc, signalMix);
+    const { subject, text } = composeReport(summary, newestByAmc, signalMix, advanced);
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

@@ -41,6 +41,26 @@ export async function putFile(filename: string, body: Buffer): Promise<string> {
   return dest;
 }
 
+/**
+ * Drop a stored file once it has served its purpose.
+ *
+ * A blob is only a transport: the Next function writes the workbook, the Python
+ * function reads it, and after ingest nothing refers to it again. Left behind,
+ * every sync re-uploads the same ~56 workbooks under fresh keys and the store
+ * grows without bound.
+ *
+ * Never throws — failing to tidy up must not fail an ingest that succeeded.
+ */
+export async function deleteFile(storedPath: string): Promise<void> {
+  if (!isRemote(storedPath)) return; // local files live under ./uploads, gitignored
+  try {
+    const { del } = await import("@vercel/blob");
+    await del(storedPath);
+  } catch {
+    // Orphaned blob; not worth failing or retrying a completed ingest over.
+  }
+}
+
 /** Basename of a URL path, percent-decoded, with a usable fallback. */
 function decodeName(pathname: string): string {
   const base = path.basename(pathname);

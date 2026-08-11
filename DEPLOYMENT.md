@@ -125,8 +125,27 @@ gitignored.
 ```
 
 Hobby allows **one run per day** with ±59min precision, so the cron fires daily
-and the route decides whether today is a sync day (`SYNC_DAY_OF_MONTH`,
-default 12). Anything more frequent fails at deploy time on Hobby.
+and the route decides whether to work. Anything more frequent fails at deploy
+time on Hobby.
+
+It works across a **window of days**, not one:
+
+| Var | Default | Meaning |
+| --- | --- | --- |
+| `SYNC_WINDOW_START` | 10 | first day of month the sync runs |
+| `SYNC_WINDOW_END` | 20 | last day it runs |
+| `SYNC_DAY_OF_MONTH` | 12 | the day that always emails a report |
+
+SEBI gives AMCs ~10 days after month-end, but they publish on a stagger — HDFC
+posts days ahead of Motilal. A single-day run silently skips whoever is late,
+and because discovery only looks at the two newest months (`months: 2`), a
+straggler missed in one run can be superseded before the next and leave a
+permanent gap. Re-ingest is an upsert, so repeating inside the window costs
+nothing but time.
+
+Email is sent when a run advances any AMC to a newer month, on
+`SYNC_DAY_OF_MONTH` regardless, and on any `?force=1` run — so eleven runs a
+month do not mean eleven emails.
 
 Trigger a run by hand:
 

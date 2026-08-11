@@ -66,3 +66,22 @@ describe("composeReport", () => {
     expect(text).toContain("New AMC: none (0 funds)");
   });
 });
+
+// Eleven runs a month must not mean eleven emails, and a quiet run should still
+// say plainly that nothing moved rather than looking identical to a busy one.
+describe("composeReport — what changed", () => {
+  it("lists the AMCs that advanced", () => {
+    const { text } = composeReport(summary, newestByAmc, signalMix, [
+      "HDFC Mutual Fund: 2026-06 → 2026-07",
+      "Tata Mutual Fund: none → 2026-06",
+    ]);
+    expect(text).toContain("New data this run:");
+    expect(text).toContain("HDFC Mutual Fund: 2026-06 → 2026-07");
+    expect(text).toContain("Tata Mutual Fund: none → 2026-06");
+  });
+
+  it("says so when nothing advanced", () => {
+    const { text } = composeReport(summary, newestByAmc, signalMix, []);
+    expect(text).toContain("No AMC advanced to a newer month this run.");
+  });
+});

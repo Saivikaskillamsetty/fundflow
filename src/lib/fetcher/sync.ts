@@ -64,6 +64,8 @@ export async function syncSource(src: AmcSource): Promise<SyncResult> {
           // Deferred to a single pass once every AMC has landed — see fanout.ts
           // and syncAll().
           recomputeSignals: false,
+          // Re-downloadable from the AMC, so the blob is transport only.
+          retainSource: false,
         });
         res.ingested += r.funds;
         res.holdings += r.holdings;

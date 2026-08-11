@@ -1,17 +1,26 @@
 // Monthly sync entrypoint, invoked by the Vercel cron in vercel.json.
 //
 // Hobby caps cron at once per day with ±59min precision, so this runs daily and
-// decides for itself whether today is a sync day. SEBI gives AMCs ~10 days after
-// month-end to publish, so the 12th reliably has the prior month.
+// decides for itself whether to work.
+//
+// It runs across a *window* of days rather than one. SEBI gives AMCs ~10 days
+// after month-end, but they publish on a stagger — HDFC posts days before
+// Motilal — and a single-day run silently skips whoever is late. Because
+// `months: 2` only ever looks at the two newest months, a straggler missed in
+// one run can be superseded before the next, leaving a permanent gap. Re-ingest
+// is an upsert, so repeating within the window is free of side effects.
 import { NextResponse } from "next/server";
 import { fanoutSync } from "@/lib/fanout";
-import { sendSyncReport } from "@/lib/report-email";
+import { newestMonthByAmc, sendSyncReport } from "@/lib/report-email";
 import { requireInternalAuth, selfOrigin, Unauthorized } from "@/lib/internal-auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+/** The canonical monthly report day — the one run that always emails. */
 const SYNC_DAY = Number(process.env.SYNC_DAY_OF_MONTH ?? "12");
+const WINDOW_START = Number(process.env.SYNC_WINDOW_START ?? "10");
+const WINDOW_END = Number(process.env.SYNC_WINDOW_END ?? "20");
 
 export async function GET(request: Request) {
   try {
@@ -26,13 +35,29 @@ export async function GET(request: Request) {
   // `force=1` runs it off-schedule, which is how you trigger a run by hand.
   const force = new URL(request.url).searchParams.get("force") === "1";
   const today = new Date().getUTCDate();
-  if (!force && today !== SYNC_DAY) {
-    return NextResponse.json({ skipped: true, today, syncDay: SYNC_DAY });
+  if (!force && (today < WINDOW_START || today > WINDOW_END)) {
+    return NextResponse.json({
+      skipped: true,
+      today,
+      window: [WINDOW_START, WINDOW_END],
+    });
   }
 
+  const before = await newestMonthByAmc();
   const summary = await fanoutSync(selfOrigin(request), process.env.CRON_SECRET!);
-  // Report failures ride along in the response instead of failing the sync —
-  // the data work succeeded regardless of whether the email went out.
-  const email = await sendSyncReport(summary);
-  return NextResponse.json({ ...summary, email });
+  const after = await newestMonthByAmc();
+
+  const advanced = Object.entries(after)
+    .filter(([amc, month]) => before[amc] !== month)
+    .map(([amc, month]) => `${amc}: ${before[amc] ?? "none"} → ${month}`);
+
+  // Running eleven times a month must not mean eleven emails. Report when there
+  // is news, and once on the canonical day so a silent month is still confirmed
+  // rather than merely assumed.
+  const shouldEmail = advanced.length > 0 || today === SYNC_DAY || force;
+  const email = shouldEmail
+    ? await sendSyncReport(summary, advanced)
+    : { sent: false, reason: "no new months; not the report day" };
+
+  return NextResponse.json({ ...summary, advanced, email });
 }
