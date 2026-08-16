@@ -30,8 +30,13 @@ export function composeReport(
   const lines: string[] = [];
   lines.push(`FundFlow monthly sync — run ${new Date().toISOString().slice(0, 10)}`);
   lines.push("");
+  // `ingested` counts scheme-months, not schemes: every AMC fetches the two
+  // newest months, so a fund it still holds is ingested once per month. Calling
+  // that "funds" made the run look like it covered twice the universe the
+  // dashboard reports.
   lines.push(
-    `This run: ${summary.ingested} funds ingested, ${summary.holdings} holdings, ` +
+    `This run: ${summary.ingested} scheme-months ingested (each fund counts ` +
+      `once per month fetched), ${summary.holdings} holdings, ` +
       `${summary.failed} failed across ${summary.amcs} AMCs.`,
   );
   lines.push("");

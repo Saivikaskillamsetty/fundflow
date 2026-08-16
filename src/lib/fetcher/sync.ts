@@ -15,6 +15,12 @@ import { enabledSources, type AmcSource } from "@/lib/fetcher/amcs";
 
 export interface SyncResult {
   amc: string;
+  /**
+   * Scheme-months ingested, not distinct schemes. Each AMC fetches its two
+   * newest months, so a fund it holds in both is counted twice — which is why
+   * this runs to roughly double the fund count the dashboard shows for a single
+   * month.
+   */
   ingested: number;
   holdings: number;
   failed: number;

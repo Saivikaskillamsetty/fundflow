@@ -11,6 +11,7 @@ import type { SyncResult } from "@/lib/fetcher/sync";
 
 export interface FanoutSummary {
   amcs: number;
+  /** Scheme-months across every AMC — see SyncResult.ingested. */
   ingested: number;
   holdings: number;
   failed: number;

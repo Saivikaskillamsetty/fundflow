@@ -43,7 +43,8 @@ describe("composeReport", () => {
     expect(text).toContain("Motilal Oswal Mutual Fund: 2026-05 (8 funds)");
     expect(text).toContain("Signals for 2026-07: BUY 800 / HOLD 2600 / SELL 810");
     expect(text).toContain("download failed 404");
-    expect(text).toContain("30 funds ingested, 1900 holdings, 1 failed across 2 AMCs");
+    expect(text).toContain("30 scheme-months ingested");
+    expect(text).toContain("1900 holdings, 1 failed across 2 AMCs");
   });
 
   it("says so plainly when there are no errors", () => {
