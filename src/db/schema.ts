@@ -132,3 +132,26 @@ export type Stock = typeof stocks.$inferSelect;
 export type Holding = typeof holdings.$inferSelect;
 export type Signal = typeof signals.$inferSelect;
 export type Upload = typeof uploads.$inferSelect;
+
+/**
+ * One row per sync run — cron or manual.
+ *
+ * The uploads table records individual files, which says nothing about whether
+ * a run happened, is still going, or died halfway. A run is inserted as
+ * `running` before any work and closed out afterwards, so an interrupted run
+ * leaves evidence rather than silence.
+ */
+export const runs = pgTable("runs", {
+  id: serial("id").primaryKey(),
+  trigger: varchar("trigger", { length: 16 }).notNull(), // cron|manual
+  status: varchar("status", { length: 16 }).notNull().default("running"), // running|done|error
+  amcs: integer("amcs"),
+  schemeMonths: integer("scheme_months"),
+  holdings: integer("holdings"),
+  failed: integer("failed"),
+  /** JSON array of "AMC: old → new" strings; empty when nothing advanced. */
+  advanced: text("advanced"),
+  errorMsg: text("error_msg"),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  finishedAt: timestamp("finished_at"),
+});

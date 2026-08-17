@@ -154,6 +154,29 @@ curl "https://fundflow-intelligence.vercel.app/api/cron/sync?force=1" \
   -H "authorization: Bearer $CRON_SECRET"
 ```
 
+## Triggering a run from the app
+
+`/runs` lists every sync — cron and manual — with status, duration, counts and
+what advanced, and carries a **Run sync now** button.
+
+It sits behind a passphrase. The dashboard is public and has no user accounts,
+so an open button would let anyone spend ~30s across ten functions, hammer nine
+AMC sites, and force re-ingestion at will. Set `ADMIN_PASSWORD` (any
+environment) and sign in once; the app exchanges it for an httpOnly cookie.
+**With `ADMIN_PASSWORD` unset the admin area is closed, not open.**
+
+`POST /api/sync` accepts either that cookie or `Authorization: Bearer
+$CRON_SECRET`, so curl keeps working.
+
+Runs are recorded in the `runs` table: a row opens as `running` before any work
+and is closed out afterwards, so a function that times out leaves evidence
+rather than silence. Rows still `running` after 10 minutes — longer than the
+300s ceiling allows — are reaped as errors when the list is read.
+
+> Local dev needs `CRON_SECRET` set too, even though nothing enforces it on the
+> way in: the fan-out authenticates to its own per-AMC functions with it. Absent,
+> the run now fails immediately saying so, rather than reporting nine broken AMCs.
+
 ## Deploying
 
 Git is connected, so pushes to `main` deploy production and branches get

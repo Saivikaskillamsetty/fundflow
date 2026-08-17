@@ -12,6 +12,7 @@
 import { NextResponse } from "next/server";
 import { fanoutSync } from "@/lib/fanout";
 import { newestMonthByAmc, sendSyncReport } from "@/lib/report-email";
+import { failRun, finishRun, startRun } from "@/lib/runs";
 import { requireInternalAuth, selfOrigin, Unauthorized } from "@/lib/internal-auth";
 
 export const runtime = "nodejs";
@@ -43,13 +44,22 @@ export async function GET(request: Request) {
     });
   }
 
-  const before = await newestMonthByAmc();
-  const summary = await fanoutSync(selfOrigin(request), process.env.CRON_SECRET!);
-  const after = await newestMonthByAmc();
+  const runId = await startRun("cron");
+  let summary;
+  let advanced: string[];
+  try {
+    const before = await newestMonthByAmc();
+    summary = await fanoutSync(selfOrigin(request), process.env.CRON_SECRET!);
+    const after = await newestMonthByAmc();
 
-  const advanced = Object.entries(after)
-    .filter(([amc, month]) => before[amc] !== month)
-    .map(([amc, month]) => `${amc}: ${before[amc] ?? "none"} → ${month}`);
+    advanced = Object.entries(after)
+      .filter(([amc, month]) => before[amc] !== month)
+      .map(([amc, month]) => `${amc}: ${before[amc] ?? "none"} → ${month}`);
+    await finishRun(runId, summary, advanced);
+  } catch (err) {
+    await failRun(runId, err);
+    throw err;
+  }
 
   // Running eleven times a month must not mean eleven emails. Report when there
   // is news, and once on the canonical day so a silent month is still confirmed
@@ -59,5 +69,5 @@ export async function GET(request: Request) {
     ? await sendSyncReport(summary, advanced)
     : { sent: false, reason: "no new months; not the report day" };
 
-  return NextResponse.json({ ...summary, advanced, email });
+  return NextResponse.json({ runId, ...summary, advanced, email });
 }

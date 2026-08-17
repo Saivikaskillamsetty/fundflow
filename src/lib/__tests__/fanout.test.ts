@@ -161,3 +161,13 @@ describe("fanoutSync", () => {
     expect(s.results[0].errors[0]).toMatch(/deployment protection/);
   });
 });
+
+// A missing CRON_SECRET made every AMC 401 and surfaced as nine broken
+// sources; name the one real cause instead.
+describe("fanoutSync without a secret", () => {
+  it("fails fast rather than fanning out to guaranteed 401s", async () => {
+    await expect(fanoutSync("https://x.test", "")).rejects.toThrow(
+      /CRON_SECRET is not set/,
+    );
+  });
+});

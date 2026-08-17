@@ -15,6 +15,7 @@ const NAV = [
   { href: "/", label: "TERMINAL" },
   { href: "/rankings", label: "RANKINGS" },
   { href: "/upload", label: "UPLOAD" },
+  { href: "/runs", label: "RUNS" },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

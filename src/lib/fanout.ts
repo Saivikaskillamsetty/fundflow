@@ -22,6 +22,16 @@ export async function fanoutSync(
   origin: string,
   secret: string,
 ): Promise<FanoutSummary> {
+  // The fan-out authenticates to its own siblings with this secret. Without it
+  // every AMC returns 401 and the run "succeeds" with nine identical failures,
+  // which reads like nine broken sources rather than one unset variable.
+  if (!secret) {
+    throw new Error(
+      "CRON_SECRET is not set, so the sync cannot authenticate to its own " +
+        "per-AMC functions. Set it for this environment.",
+    );
+  }
+
   const settled = await Promise.allSettled(
     enabledSources().map(async (src): Promise<SyncResult> => {
       const res = await fetch(
