@@ -124,3 +124,49 @@ describe("internalHeaders", () => {
     expect(internalHeaders(SECRET)["x-vercel-protection-bypass"]).toBe("bypass123");
   });
 });
+
+// selfOrigin always assumed https. Off Vercel that points the fan-out at a port
+// nothing serves, and every AMC returns "fetch failed" — which reads like nine
+// broken sources rather than one wrong scheme.
+describe("selfOrigin scheme", () => {
+  const ORIGINAL = { ...process.env };
+  afterEach(() => {
+    process.env = { ...ORIGINAL };
+  });
+
+  it("mirrors the request scheme when not on Vercel", () => {
+    delete process.env.VERCEL_URL;
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    const req = new Request("http://localhost:3000/api/sync", {
+      headers: { host: "localhost:3000" },
+    });
+    expect(selfOrigin(req)).toBe("http://localhost:3000");
+  });
+
+  it("still uses https for a Vercel host", () => {
+    delete process.env.VERCEL_ENV;
+    process.env.VERCEL_URL = "fundflow-abc.vercel.app";
+    const req = new Request("http://internal/api/sync", {
+      headers: { host: "internal" },
+    });
+    expect(selfOrigin(req)).toBe("https://fundflow-abc.vercel.app");
+  });
+
+  it("prefers the production domain in production", () => {
+    process.env.VERCEL_ENV = "production";
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fundflow-intelligence.vercel.app";
+    process.env.VERCEL_URL = "fundflow-abc.vercel.app";
+    const req = new Request("https://x/api/sync", { headers: { host: "x" } });
+    expect(selfOrigin(req)).toBe("https://fundflow-intelligence.vercel.app");
+  });
+
+  it("honours a forwarded proto ahead of the request URL", () => {
+    delete process.env.VERCEL_URL;
+    delete process.env.VERCEL_ENV;
+    const req = new Request("http://proxy/api/sync", {
+      headers: { host: "app.example.com", "x-forwarded-proto": "https" },
+    });
+    expect(selfOrigin(req)).toBe("https://app.example.com");
+  });
+});

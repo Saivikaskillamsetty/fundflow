@@ -159,13 +159,15 @@ export default function RunsPage() {
           </h2>
           {pending && <span className="text-[10px] text-accent">in progress…</span>}
         </div>
-        <div className="p-3">
+        {/* Eight columns do not fit a phone; let the table scroll rather than
+            the page, so the header and nav stay put. */}
+        <div className="overflow-x-auto p-3">
           {runs === null ? (
             <div className="text-xs text-muted">Loading…</div>
           ) : runs.length === 0 ? (
             <div className="text-xs text-muted">No runs recorded yet.</div>
           ) : (
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[46rem] text-xs">
               <thead>
                 <tr className="text-left text-[10px] uppercase text-muted">
                   <th className="pb-1">Started</th>

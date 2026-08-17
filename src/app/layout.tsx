@@ -26,24 +26,27 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body className="min-h-full flex flex-col">
         <header className="border-b border-edge bg-panel">
-          <div className="mx-auto flex max-w-[1400px] items-center gap-6 px-4 py-2.5">
-            <Link href="/" className="flex items-center gap-2">
+          {/* The bar never fit a phone — the tagline alone pushed past 375px, and
+              each nav item made it worse. The wordmark and links stay; the
+              decorative parts give way first. */}
+          <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-2.5 sm:gap-6">
+            <Link href="/" className="flex shrink-0 items-center gap-2">
               <span className="text-up font-bold tracking-tight">▮▮</span>
               <span className="font-bold tracking-tight">FundFlow</span>
-              <span className="text-muted text-xs">INTELLIGENCE</span>
+              <span className="text-muted hidden text-xs sm:inline">INTELLIGENCE</span>
             </Link>
-            <nav className="flex gap-1 text-xs">
+            <nav className="flex min-w-0 flex-1 gap-1 overflow-x-auto text-xs">
               {NAV.map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
-                  className="rounded px-3 py-1.5 text-muted hover:bg-panel2 hover:text-foreground"
+                  className="shrink-0 rounded px-3 py-1.5 text-muted hover:bg-panel2 hover:text-foreground"
                 >
                   {n.label}
                 </Link>
               ))}
             </nav>
-            <div className="ml-auto text-[10px] text-muted">
+            <div className="ml-auto hidden shrink-0 text-[10px] text-muted lg:block">
               INSTITUTIONAL ACTIVITY MONITOR
             </div>
           </div>

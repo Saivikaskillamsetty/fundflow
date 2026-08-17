@@ -37,14 +37,24 @@ export function requireInternalAuth(request: Request): void {
  * Both resolve to the same deployment; only the protection differs.
  */
 export function selfOrigin(request: Request): string {
-  const host =
+  const deployed =
     (process.env.VERCEL_ENV === "production"
       ? process.env.VERCEL_PROJECT_PRODUCTION_URL
-      : undefined) ||
-    process.env.VERCEL_URL ||
-    request.headers.get("host");
+      : undefined) || process.env.VERCEL_URL;
+  // Every Vercel host is served over TLS, so a bare hostname implies https.
+  if (deployed) {
+    return deployed.startsWith("http") ? deployed : `https://${deployed}`;
+  }
+
+  // Off Vercel — `next dev`, a test — assuming https would send the fan-out to
+  // a port nothing is listening on and every AMC would come back "fetch
+  // failed". Mirror the scheme the request actually arrived on.
+  const url = new URL(request.url);
+  const host = request.headers.get("host") ?? url.host;
   if (!host) throw new Error("cannot determine deployment origin");
-  return host.startsWith("http") ? host : `https://${host}`;
+  const proto =
+    request.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "");
+  return `${proto}://${host}`;
 }
 
 /**
